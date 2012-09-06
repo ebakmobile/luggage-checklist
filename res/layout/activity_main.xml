@@ -19,7 +19,7 @@
             android:layout_height="50dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:src="@drawable/reddog" />
+            android:src="@drawable/plus" />
 
         <TextView
             android:id="@+id/trip_add"
