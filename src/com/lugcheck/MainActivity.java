@@ -10,6 +10,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -54,24 +56,25 @@ public class MainActivity extends Activity {
 		 c.moveToFirst();
 		while (c.isAfterLast() == false)
 		 {  
-			
-			
+					
 			TextView hw= new TextView(this);
 			String text=c.getString(c.getColumnIndex("trip_name")); 
 			hw.setText(text);
+			hw.setTextSize(16);
 			
 			//LinearLayout newTab = (LinearLayout) findViewById(R.id.existing_trip);
 			//LinearLayout newTab= (LinearLayout)View.inflate(this, R.layout.activity_main, null);
-		    LinearLayout newTab=new LinearLayout(this);
+		   		
+			LinearLayout newTab=new LinearLayout(this);
 			newTab.addView(hw);   
 
 		    LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 		    newTab.setOrientation(LinearLayout.VERTICAL);
-			
+			newTab.setBackgroundColor(Color.RED);
 			
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 			tripContainer.addView(newTab, 0,lp);
-			//tripContainer.addView(newTab);
+			
 			c.moveToNext();
 			 			 
 		 }//end while*/
