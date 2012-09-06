@@ -4,9 +4,11 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -17,17 +19,28 @@ import android.widget.LinearLayout;
 
 public class MainActivity extends Activity {
 	static int limit; //limit to only creating one trip at a time
-
-	Map<String, LinearLayout> tabs;
-
-
+	private static final int DATABASE_VERSION = 2;
+    private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip text not null, suitcase text not null);";
+    SQLiteDatabase db; 
+    
+   
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		limit=0;
-		tabs = new HashMap<String, LinearLayout>();
-	}
+		db=openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
+		db.setVersion(1);
+		db.setLocale(Locale.getDefault());
+		db.setLocale(Locale.getDefault());
+		db.execSQL(TRIP_TABLE_CREATE);
+		
+	//	db.execSQL("INSERT INTO trip_table Values ('test1', 'test2')");
+				
+		}
+
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,16 +82,18 @@ public class MainActivity extends Activity {
 			okButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
 					limit =0; // allow to recreate a new button
-					//do stuff to add
+					
+					//TODO: check to make sure name doesnt already exist in Database
+					
+					
+					db.execSQL("INSERT INTO trip_table Values ('test1', 'test2')"); // insert into db
+					
+					
+					
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
 					EditText textBox = (EditText) buttonParent.getChildAt(0);
 					String tripName = textBox.getText().toString();
-					if (tabs.get(tripName) == null) {
-						// TODO: Block due to duplicate name
-					} else {
-						tabs.put(tripName, buttonParent);
-					}
-					// TODO: Hide the OK button. Cancel replaced by delete button.
+										
 					// TODO: Switch to trip activity
 				}
 			});
