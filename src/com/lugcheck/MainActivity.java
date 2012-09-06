@@ -21,9 +21,9 @@ public class MainActivity extends Activity {
 	static int limit; //limit to only creating one trip at a time
 	private static final int DATABASE_VERSION = 2;
 	SQLiteDatabase db; 
-    private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer primary key autoincrement, trip_name text);";
-    private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer primary key autoincrement, suitcase_name text, FOREIGN KEY (trip_id) REFERENCES trip_table (trip_id) );";
-    private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer autoincrement, item name text, quantity integer, FOREIGN KEY(suitcase_id) references suitcase_table(suitcase_id), PRIMARY KEY(item_id,suitcase_id)) ;";
+    private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
+    private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer PRIMARY KEY autoincrement, suitcase_name text, trip_id INTEGER REFERENCES trip_table (trip_id) );";
+    private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity integer, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
     //TODO: FIX Database creation schemas
     
 	@Override
@@ -37,8 +37,8 @@ public class MainActivity extends Activity {
 		db.setLocale(Locale.getDefault());
 		db.setLocale(Locale.getDefault());
 		db.execSQL(TRIP_TABLE_CREATE);
-		//db.execSQL(SUITCASE_TABLE_CREATE);
-		//db.execSQL(ITEM_TABLE_CREATE);
+		db.execSQL(SUITCASE_TABLE_CREATE);
+		db.execSQL(ITEM_TABLE_CREATE);
 
 				
 		}
@@ -91,6 +91,9 @@ public class MainActivity extends Activity {
 					
 					db.execSQL("INSERT INTO trip_table (trip_name) Values ('test')"); // insert into trip_table db
 					
+					db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
+					
+					db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
 					
 					
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
