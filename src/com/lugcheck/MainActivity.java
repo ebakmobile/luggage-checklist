@@ -68,7 +68,8 @@ public class MainActivity extends Activity {
 			int pad = (int)(5*d);
 			im.setPadding(pad, pad, 0, 0);
 			// END
-			   		
+			int txtPadding=(int)(20*d);
+            hw.setPadding(0, txtPadding, 0, 0);  		
 			LinearLayout newTab=new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.HORIZONTAL);
 			newTab.addView(im);
