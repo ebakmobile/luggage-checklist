@@ -61,11 +61,12 @@ public class MainActivity extends Activity {
 			String text=c.getString(c.getColumnIndex("trip_name")); 
 			hw.setText(text);
 			hw.setTextSize(16);
+			//ImageView im=new ImageView(this);
+			//im.setImageResource(R.drawable.plane);
 			
-			//LinearLayout newTab = (LinearLayout) findViewById(R.id.existing_trip);
-			//LinearLayout newTab= (LinearLayout)View.inflate(this, R.layout.activity_main, null);
-		   		
+			   		
 			LinearLayout newTab=new LinearLayout(this);
+		//  newTab.addView(im);
 			newTab.addView(hw);   
 
 		    LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
@@ -73,7 +74,8 @@ public class MainActivity extends Activity {
 			newTab.setBackgroundColor(Color.RED);
 			
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-			tripContainer.addView(newTab, 0,lp);
+			//tripContainer.addView(newTab, 0,lp);
+			tripContainer.addView(newTab);
 			
 			c.moveToNext();
 			 			 
