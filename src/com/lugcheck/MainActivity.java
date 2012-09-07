@@ -3,16 +3,13 @@ package com.lugcheck;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -61,16 +58,23 @@ public class MainActivity extends Activity {
 			String text=c.getString(c.getColumnIndex("trip_name")); 
 			hw.setText(text);
 			hw.setTextSize(16);
-			//ImageView im=new ImageView(this);
-			//im.setImageResource(R.drawable.plane);
-			
+			ImageView im=new ImageView(this);
+			im.setImageResource(R.drawable.plane);
+			// FROM STACKOVERFLOW!
+			float d = this.getResources().getDisplayMetrics().density;
+			int width = (int)(58 * d);
+			int height = (int)(50 * d);
+			im.setLayoutParams(new LayoutParams(width, height));
+			int pad = (int)(5*d);
+			im.setPadding(pad, pad, 0, 0);
+			// END
 			   		
 			LinearLayout newTab=new LinearLayout(this);
-		//  newTab.addView(im);
+			newTab.setOrientation(LinearLayout.HORIZONTAL);
+			newTab.addView(im);
 			newTab.addView(hw);   
 
-		    LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-		    newTab.setOrientation(LinearLayout.VERTICAL);
+		    //LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT); WHAT ARE DEFAULT PARAMS???
 			newTab.setBackgroundColor(Color.RED);
 			
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
