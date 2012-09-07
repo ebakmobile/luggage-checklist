@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -34,7 +35,7 @@ public class MainActivity extends Activity {
 	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
 
 	ArrayList <LinearLayout> arrayLL; //array list that stores all layouts
-
+	public static int TRIP_ID = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,15 +51,27 @@ public class MainActivity extends Activity {
 		db.execSQL(TRIP_TABLE_CREATE);
 		db.execSQL(SUITCASE_TABLE_CREATE);
 		db.execSQL(ITEM_TABLE_CREATE);
+		createLayoutsFromDB();
+       
+	}
 
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+		return true;
+	}
+
+	
+	public void createLayoutsFromDB()
+	{
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
 		Cursor c = db.rawQuery("SELECT * from trip_table", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false)
 		{  
-
-
 
 			TextView hw= new TextView(this);
 			String text=c.getString(c.getColumnIndex("trip_name")); 
@@ -84,6 +97,7 @@ public class MainActivity extends Activity {
 			newTab.addView(hw);   
 			newTab.setBackgroundColor(Color.RED);
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+									
 			tripContainer.addView(newTab);
 			arrayLL.add(newTab);
 			c.moveToNext();
@@ -93,17 +107,24 @@ public class MainActivity extends Activity {
 
 		}//end while*/
 
-
+		/* for loop below creates a listener for each trip from the DB */
+		
 		for(int i=0; i< arrayLL.size();i++)
 
 		{   
 			LinearLayout temp=arrayLL.get(i);
-
+			final int iii=i;
+			final String ii="i is " + iii;
 			temp.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View v) {
-
-					//not even sure if this will make a listener for each one
-				}});
+					
+					//pass to new activity iii+1;
+					
+					Intent intent = new Intent(MainActivity.this, TripActivity.class);
+					intent.putExtra("trip_id", (int)(iii+1));
+					startActivity(intent);
+										
+					}});
 
 		}
 
@@ -111,16 +132,8 @@ public class MainActivity extends Activity {
 
 		c.close();
 
-	}
-
-
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
-	}
-
+	}//end method
+	
 	public void addTrip(View view) {
 
 
@@ -146,15 +159,13 @@ public class MainActivity extends Activity {
 			newTab.addView(ll);
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-			//int count = tripContainer.getChildCount();
 			tripContainer.addView(newTab, 0,lp);
 
-			// TODO: Set id for the new trip tab to new_trip_tab. Once name is entered, change the ID.
-			// TODO: Check for uniqueness
+		
 
 			okButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					limit =0; // allow to recreate a new button
+					limit =0; // allow to recreate a new trip
 
 					//TODO: check to make sure name doesnt already exist in Database
 
@@ -163,8 +174,17 @@ public class MainActivity extends Activity {
 					String tripName = textBox.getText().toString();
 					String INSERT_STATEMENT= "INSERT INTO trip_table (trip_name) Values ('"+ tripName+ "')";
 					db.execSQL(INSERT_STATEMENT); // insert into trip_table db
-
-					// TODO: Switch to trip activity
+					
+					
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 
+					for(int i=1; i<=tripContainer.getChildCount();i++) // this code is to remove all the trips and then it can be refreshed 
+					{
+					   tripContainer.removeViewAt(i);	
+					}
+										
+					createLayoutsFromDB();
+					
+					
 				}
 			});
 
@@ -172,11 +192,13 @@ public class MainActivity extends Activity {
 				public void onClick(View v) {
 					limit=0;
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 	
-					int count=tripContainer.getChildCount();
-					tripContainer.removeViewAt(0);	// TODO: Look on internet on how to find the proper count
-
-					/*cancelButton.getParent();
-					tripContainer.removeView(parent);*/
+					tripContainer.removeViewAt(0);	
+					LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
+					
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					createLayoutsFromDB();
+					
 				}
 			});
 
