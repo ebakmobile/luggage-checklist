@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
 	private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
 	private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer PRIMARY KEY autoincrement, suitcase_name text, trip_id INTEGER REFERENCES trip_table (trip_id) );";
 	private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity integer, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
-	LinearLayout [] trip_layouts;
+	
 	//db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
 	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
 
@@ -60,9 +60,10 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
-		arrayLL= new ArrayList<LinearLayout>();
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		arrayLL= new ArrayList<LinearLayout>();
 		limit=0;
 		db=openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
@@ -123,25 +124,28 @@ public class MainActivity extends Activity {
 			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 				public boolean onLongClick(View v) {
 
-
-					AlertDialog al = new AlertDialog.Builder(MainActivity.this).create();
-					al.setMessage("Delete this trip?");
-					al.setButton("Yes", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {	
-
-							deleteFromDB(text2);	
-
-
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+					builder.setMessage("Are you sure you want delete?")
+					.setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							deleteFromDB(text2);	 
 						}
-					} );
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					});
 
-					al.show();        	       	
+					AlertDialog alert = builder.create();
+					alert.show();
 					return true;	
 				}
 			});
 
 
-			/* Code below handles the situation where u click a trip */
+			/* Code below handles the situation where u want to open a trip */
 			final int trip_id2=trip_id;
 			newTab.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View v) {

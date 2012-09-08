@@ -1,3 +1,4 @@
+<<<<<<< Original
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lugcheck"
     android:versionCode="1"
@@ -36,6 +37,26 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.lugcheck.MainActivity" />
         </activity>
+        <activity
+            android:name=".SuitcaseActivity"
+            android:label="@string/title_activity_suitcase" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lugcheck.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
+=======
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <application>
+        <activity android:name=".TripActivity"
+            android:label="@string/title_activity_trip">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lugcheck.MainActivity" />
+        </activity>
+    </application>
+
+</manifest>
+>>>>>>> Added
