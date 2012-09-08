@@ -20,6 +20,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
@@ -76,13 +77,6 @@ public class MainActivity extends Activity {
 
 
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
-	}
-
-
 	public void createLayoutsFromDB()
 	{
 
@@ -94,6 +88,7 @@ public class MainActivity extends Activity {
 
 			TextView hw= new TextView(this);
 			String text=c.getString(c.getColumnIndex("trip_name")); 
+			int trip_id=c.getInt(c.getColumnIndex("trip_id")); 
 			hw.setText(text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			ImageView im=new ImageView(this);
@@ -114,7 +109,7 @@ public class MainActivity extends Activity {
 			newTab.setOrientation(LinearLayout.HORIZONTAL);
 			newTab.addView(im);
 			newTab.addView(hw);   
-			newTab.setBackgroundColor(Color.RED);
+			newTab.setBackgroundColor(Color.WHITE);
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 
 			tripContainer.addView(newTab);
@@ -123,30 +118,45 @@ public class MainActivity extends Activity {
 
 
 
+			/*Code Below handles the delete situation*/
+			final String text2=text;
+			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
+				public boolean onLongClick(View v) {
 
-		}//end while*/
 
-		/* for loop below creates a listener for each trip from the DB */
+					AlertDialog al = new AlertDialog.Builder(MainActivity.this).create();
+					al.setMessage("Delete this trip?");
+					al.setButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {	
 
-		for(int i=0; i< arrayLL.size();i++)
+							deleteFromDB(text2);	
 
-		{   
-			LinearLayout temp=arrayLL.get(i);
-			final int iii=i;
-			final String ii="i is " + iii;
-			temp.setOnClickListener(new Button.OnClickListener() {
+
+						}
+					} );
+
+					al.show();        	       	
+					return true;	
+				}
+			});
+
+
+			/* Code below handles the situation where u click a trip */
+			final int trip_id2=trip_id;
+			newTab.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View v) {
 
-					//pass to new activity iii+1;
-
 					Intent intent = new Intent(MainActivity.this, TripActivity.class);
-					intent.putExtra("trip_id", (int)(iii+1));
+					intent.putExtra("trip_id", trip_id2);
 					startActivity(intent);
 
 				}});
 
-		}
 
+
+
+
+		}//end while*/
 
 
 		c.close();
@@ -155,7 +165,19 @@ public class MainActivity extends Activity {
 
 
 
+	public void deleteFromDB(String i)
+	{
 
+		String deleteFromDB= "delete from trip_table where trip_name = '" + i+ "'";
+		db.execSQL(deleteFromDB);	
+
+		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 
+		LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
+		tripContainer.removeAllViews();
+		tripContainer.addView(addTrip);
+		createLayoutsFromDB();	
+
+	}
 
 	public void addTrip(View view) {
 
@@ -193,71 +215,71 @@ public class MainActivity extends Activity {
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
 					EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
 					String tripName = textBox.getText().toString();
-					
+
 					if(tripName.equals("")) //if they try to add a null trip to database
 					{
 						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
-						 dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
-						 dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-							 public void onClick(DialogInterface dialog, int which) {			 
-							 }
-				 			 } );
-					
+						dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
+						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {			 
+							}
+						} );
+
 						dupe.show();
-						
+
 					}
-					
-				
+
+
 					//code below checks for duplicates in database
 					else {
-					Cursor c = db.rawQuery("SELECT * from trip_table", null);
-					c.moveToFirst();
+						Cursor c = db.rawQuery("SELECT * from trip_table", null);
+						c.moveToFirst();
 
-					boolean isDupe=false;
-					while (c.isAfterLast() == false)
-					{  
-						String text=c.getString(c.getColumnIndex("trip_name")); 
-						c.moveToNext();
-						if(text.equals(tripName))
-						{isDupe=true;
-						break;
+						boolean isDupe=false;
+						while (c.isAfterLast() == false)
+						{  
+							String text=c.getString(c.getColumnIndex("trip_name")); 
+							c.moveToNext();
+							if(text.equals(tripName))
+							{isDupe=true;
+							break;
+							}
+						}//end while*/
+
+						c.close();
+
+						if (isDupe==false)
+						{String INSERT_STATEMENT= "INSERT INTO trip_table (trip_name) Values ('"+ tripName+ "')";
+						db.execSQL(INSERT_STATEMENT); // insert into trip_table db
+
+
+						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 
+						LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
+						tripContainer.removeAllViews();
+						tripContainer.addView(addTrip);
+						createLayoutsFromDB();
 						}
-					}//end while*/
 
-					c.close();
+						else
+						{
 
-					if (isDupe==false)
-					{String INSERT_STATEMENT= "INSERT INTO trip_table (trip_name) Values ('"+ tripName+ "')";
-					db.execSQL(INSERT_STATEMENT); // insert into trip_table db
+							AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+							dupe.setTitle("Duplicate Found");
+							dupe.setMessage("Trip already exists. Please use that trip instead");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {			 
+								}
+							} );
+
+							dupe.show();
 
 
-					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 
-					LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
-					tripContainer.removeAllViews();
-					tripContainer.addView(addTrip);
-					createLayoutsFromDB();
+
+						}//end else
+
+
 					}
-					
-					else
-					{
-						
-						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
-						 dupe.setTitle("Duplicate Found");
-						 dupe.setMessage("Trip already exists. Please use that trip instead");
-						 dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-							 public void onClick(DialogInterface dialog, int which) {			 
-							 }
-				 			 } );
-					
-						dupe.show();
-						
-
-						
-					}//end else
-					
-
 				}
-			}
 			});
 
 			cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -273,7 +295,7 @@ public class MainActivity extends Activity {
 				}
 			});
 
-			
+
 
 		}
 

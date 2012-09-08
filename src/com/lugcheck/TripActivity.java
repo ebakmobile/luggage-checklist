@@ -20,19 +20,14 @@ public class TripActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         trip_id = extras.getInt("trip_id"); // receiving trip_id from previous intent
           	
-      // String bah= "In Suitcase Class, Trip_id is " + trip_id;
-        //Log.w("SDFDS", bah);
+      String bah= "In Suitcase Class, Trip_id is " + trip_id;
+        Log.w("SDFDS", bah);
                
         
         
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_suitcase, menu);
-        return true;
-    }
-
+ 
     
  
     
