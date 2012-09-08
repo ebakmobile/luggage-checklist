@@ -6,6 +6,7 @@
     <string name="add_new_trip">Add New Trip</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_activity_b">ActivityB</string>
-    <string name="title_activity_suitcase">SuitcaseActivity</string>
+    <string name="title_activity_suitcase">Suitcase Screen</string>
+    <string name="title_activity_trip">TripActivity</string>
 
 </resources>
