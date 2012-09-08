@@ -29,6 +29,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".TripActivity"
+            android:label="@string/title_activity_suitcase" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lugcheck.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
