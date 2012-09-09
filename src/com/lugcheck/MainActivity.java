@@ -123,22 +123,26 @@ public class MainActivity extends Activity {
 			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 				public boolean onLongClick(View v) {
 
-
-					AlertDialog al = new AlertDialog.Builder(MainActivity.this).create();
-					al.setMessage("Delete this trip?");
-					al.setButton("Yes", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {	
-
-							deleteFromDB(text2);	
-
-
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+					builder.setMessage("Are you sure you want delete?")
+					.setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							deleteFromDB(text2);	 
 						}
-					} );
+					})
+					.setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					});
 
-					al.show();        	       	
+					AlertDialog alert = builder.create();
+					alert.show();
 					return true;	
 				}
 			});
+
 
 
 			/* Code below handles the situation where u click a trip */
