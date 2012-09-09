@@ -1,27 +1,18 @@
-
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
->
-
-
-
-<LinearLayout 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/trips_container"
+    android:id="@+id/suitcase_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/add_trip"
+        android:id="@+id/add_suitcase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/light_red"
         android:orientation="horizontal"
-        android:onClick="addTrip">
+        android:onClick="addSuitcase">
 
         <ImageView
             android:id="@+id/plus_sign"
@@ -36,7 +27,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:paddingTop="20dp"
-            android:text="@string/add_new_trip"
+            android:text="Add New Suitcase"
             android:textSize="16sp"/>
     </LinearLayout>
 
@@ -44,5 +35,3 @@
     
     
 </LinearLayout>
-
-</ScrollView>
