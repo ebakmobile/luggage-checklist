@@ -22,7 +22,7 @@
         </activity>
      
         <activity
-            android:name=".TripActivity"
+            android:name=".SuitcaseActivity"
             android:label="@string/title_activity_suitcase" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

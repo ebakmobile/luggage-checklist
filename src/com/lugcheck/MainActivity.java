@@ -67,7 +67,6 @@ public class MainActivity extends Activity {
 		db=openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
-		db.setLocale(Locale.getDefault());
 		db.execSQL(TRIP_TABLE_CREATE);
 		db.execSQL(SUITCASE_TABLE_CREATE);
 		db.execSQL(ITEM_TABLE_CREATE);
@@ -150,7 +149,7 @@ public class MainActivity extends Activity {
 			newTab.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View v) {
 
-					Intent intent = new Intent(MainActivity.this, TripActivity.class);
+					Intent intent = new Intent(MainActivity.this, SuitcaseActivity.class);
 					intent.putExtra("trip_id", trip_id2);
 					startActivity(intent);
 
@@ -291,7 +290,6 @@ public class MainActivity extends Activity {
 					limit=0;
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 	
 					LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
-
 					tripContainer.removeAllViews();
 					tripContainer.addView(addTrip);
 					createLayoutsFromDB();
