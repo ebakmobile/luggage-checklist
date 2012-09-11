@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -54,6 +55,12 @@ public class SuitcaseActivity extends Activity {
 		c.moveToFirst();		
 		String trip_name= c.getString(c.getColumnIndex("trip_name")); 
 		setTitle("Displaying suitcases for "+ trip_name + " trip");
+		
+		
+		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
+		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		tripContainer.addView(ruler,
+		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
 
 
@@ -64,7 +71,7 @@ public class SuitcaseActivity extends Activity {
 	{
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
-		Cursor c = db.rawQuery("SELECT * from suitcase_table", null);
+		Cursor c = db.rawQuery("SELECT * from suitcase_table where trip_id = '" + trip_id + "'", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false)
 		{  
@@ -96,6 +103,9 @@ public class SuitcaseActivity extends Activity {
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 
 			tripContainer.addView(newTab);
+			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			tripContainer.addView(ruler,
+			new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 			c.moveToNext();
 
 
@@ -110,7 +120,7 @@ public class SuitcaseActivity extends Activity {
 					.setCancelable(false)
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-							deleteFromDB(text2);	 
+							deleteFromDB(text2,trip_id);	 
 						}
 					})
 					.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -148,16 +158,19 @@ public class SuitcaseActivity extends Activity {
 	}//end method
 
 
-	public void deleteFromDB(String i)
+	public void deleteFromDB(String i, int trip_id)
 	{
 
-		String deleteFromDB= "delete from suitcase_table where trip_name = '" + i+ "'";
+		String deleteFromDB= "delete from suitcase_table where suitcase_name = '" + i+ "' and trip_id = '"+trip_id + "'";
 		db.execSQL(deleteFromDB);	
 
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container); 
 		LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_suitcase); 
 		tripContainer.removeAllViews();
 		tripContainer.addView(addTrip);
+		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		tripContainer.addView(ruler,
+		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();	
 
 	}
@@ -188,12 +201,13 @@ public class SuitcaseActivity extends Activity {
 		
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 		tripContainer.addView(newTab, 0,lp);
+		
 
 		//Code below is for adding a trip to the database
 		okButton.setOnClickListener(new View.OnClickListener() { 
 			@SuppressWarnings("deprecation")
 			public void onClick(View v) {
-				limit =0; // allow to recreate a new trip
+				
 
 				LinearLayout buttonParent = (LinearLayout) okButton.getParent();
 				EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
@@ -215,7 +229,8 @@ public class SuitcaseActivity extends Activity {
 
 				//code below checks for duplicates in database
 				else {
-					Cursor c = db.rawQuery("SELECT * from suitcase_table", null);
+					
+					Cursor c = db.rawQuery("SELECT * from suitcase_table where trip_id='"+trip_id+"'", null);
 					c.moveToFirst();
 
 					boolean isDupe=false;
@@ -234,12 +249,15 @@ public class SuitcaseActivity extends Activity {
 					if (isDupe==false)
 					{String INSERT_STATEMENT= "INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('"+ suitcaseName+ "', '" + trip_id+ "')";
 					db.execSQL(INSERT_STATEMENT); // insert into suitcase_table db
-
+					limit =0; // allow to recreate a new trip
 
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container); 
 					LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_suitcase); 
 					tripContainer.removeAllViews();
 					tripContainer.addView(addTrip);
+					View ruler = new View(SuitcaseActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler,
+					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 					createLayoutsFromDB();
 					}
 
@@ -248,7 +266,7 @@ public class SuitcaseActivity extends Activity {
 
 						AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
 						dupe.setTitle("Duplicate Found");
-						dupe.setMessage("Suitcase name already exists. Please use that trip instead");
+						dupe.setMessage("Suitcase name already exists. Please use that suitcase instead");
 						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {			 
 							}
@@ -272,6 +290,9 @@ public class SuitcaseActivity extends Activity {
 				LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_suitcase); 
 				tripContainer.removeAllViews();
 				tripContainer.addView(addTrip);
+				View ruler = new View(SuitcaseActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+				tripContainer.addView(ruler,
+				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 				createLayoutsFromDB();
 
 			}

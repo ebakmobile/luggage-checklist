@@ -16,9 +16,7 @@ public class ItemActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        
-        
+
         
     	Bundle extras = getIntent().getExtras();
 		suitcase_id = extras.getInt("suitcase_id"); // receiving trip_id from previous activity 

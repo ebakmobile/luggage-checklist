@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +49,12 @@ public class MainActivity extends Activity {
 		db.execSQL(TRIP_TABLE_CREATE);
 		db.execSQL(SUITCASE_TABLE_CREATE);
 		db.execSQL(ITEM_TABLE_CREATE);
+		
+		/* code below just adds a black horizontal line*/
+		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		tripContainer.addView(ruler,
+		 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
 
 	}
@@ -88,8 +95,13 @@ public class MainActivity extends Activity {
 			newTab.addView(hw);   
 			newTab.setBackgroundColor(Color.WHITE);
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-
 			tripContainer.addView(newTab);
+			
+			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			tripContainer.addView(ruler,
+			 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+			
+			
 			c.moveToNext();
 
 
@@ -155,6 +167,9 @@ public class MainActivity extends Activity {
 		LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
 		tripContainer.removeAllViews();
 		tripContainer.addView(addTrip);
+		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		tripContainer.addView(ruler,
+		 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();	
 
 	}
@@ -190,7 +205,7 @@ public class MainActivity extends Activity {
 			okButton.setOnClickListener(new View.OnClickListener() { 
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
-					limit =0; // allow to recreate a new trip
+				
 
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
 					EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
@@ -232,11 +247,14 @@ public class MainActivity extends Activity {
 						{String INSERT_STATEMENT= "INSERT INTO trip_table (trip_name) Values ('"+ tripName+ "')";
 						db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 
-
+						limit=0;
 						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container); 
 						LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
 						tripContainer.removeAllViews();
 						tripContainer.addView(addTrip);
+						View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+						tripContainer.addView(ruler,
+						 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 						createLayoutsFromDB();
 						}
 
@@ -269,6 +287,9 @@ public class MainActivity extends Activity {
 					LinearLayout addTrip=(LinearLayout) findViewById(R.id.add_trip); 
 					tripContainer.removeAllViews();
 					tripContainer.addView(addTrip);
+					View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler,
+					 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 					createLayoutsFromDB();
 
 				}
