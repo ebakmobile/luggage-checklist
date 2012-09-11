@@ -3,22 +3,18 @@ package com.lugcheck;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-import java.util.ArrayList;
+
 import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -26,41 +22,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Message;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.support.v4.app.NavUtils;
+
 
 public class MainActivity extends Activity {
+	
 	static int limit; //limit to only creating one trip at a time
-	private static final int DATABASE_VERSION = 2;
 	SQLiteDatabase db; 
 	private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
 	private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer PRIMARY KEY autoincrement, suitcase_name text, trip_id INTEGER REFERENCES trip_table (trip_id) );";
 	private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity integer, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
-	LinearLayout [] trip_layouts;
 	//db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
 	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
-
-	ArrayList <LinearLayout> arrayLL; //array list that stores all layouts
 	public static int TRIP_ID = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
-		arrayLL= new ArrayList<LinearLayout>();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		limit=0;
@@ -112,7 +90,6 @@ public class MainActivity extends Activity {
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 
 			tripContainer.addView(newTab);
-			arrayLL.add(newTab);
 			c.moveToNext();
 
 
@@ -268,7 +245,7 @@ public class MainActivity extends Activity {
 
 							AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
 							dupe.setTitle("Duplicate Found");
-							dupe.setMessage("Trip already exists. Please use that trip instead");
+							dupe.setMessage("Trip name already exists. Please use that trip instead");
 							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {			 
 								}

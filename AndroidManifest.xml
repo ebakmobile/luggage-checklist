@@ -20,10 +20,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-     
         <activity
             android:name=".SuitcaseActivity"
             android:label="@string/title_activity_suitcase" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lugcheck.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ItemActivity"
+            android:label="@string/title_activity_item" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.lugcheck.MainActivity" />
