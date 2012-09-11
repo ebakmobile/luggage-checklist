@@ -197,7 +197,11 @@ public class MainActivity extends Activity {
 			ll.addView(cancelButton);
 
 			newTab.addView(ll);
-
+			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			newTab.addView(ruler,
+			new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+			
+			
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 			tripContainer.addView(newTab, 0,lp);
 

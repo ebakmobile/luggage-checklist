@@ -10,9 +10,9 @@
         android:id="@+id/add_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_red"
+        android:background="@color/DarkSalmon"
         android:orientation="horizontal"
-        android:onClick="addSuitcase">
+        android:onClick="addItem">
 
         <ImageView
             android:id="@+id/plus_sign"
@@ -27,7 +27,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:paddingTop="20dp"
-            android:text="Add New Suitcase"
+            android:text="Add New Item"
             android:textSize="16sp"/>
     </LinearLayout>
 

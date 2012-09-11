@@ -54,7 +54,7 @@ public class SuitcaseActivity extends Activity {
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();		
 		String trip_name= c.getString(c.getColumnIndex("trip_name")); 
-		setTitle("Displaying suitcases for "+ trip_name + " trip");
+		setTitle("Displaying Suitcases for "+ trip_name );
 		
 		
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
@@ -62,6 +62,7 @@ public class SuitcaseActivity extends Activity {
 		tripContainer.addView(ruler,
 		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
+		
 
 
 	} //end onCreate
@@ -186,7 +187,7 @@ public class SuitcaseActivity extends Activity {
 		final LinearLayout newTab = new LinearLayout(this);
 		newTab.setOrientation(LinearLayout.VERTICAL);
 		final EditText hw = new EditText(this);
-		hw.setHint("Enter trip name");	
+		hw.setHint("Enter suitcase name");	
 		final Button okButton=new Button(this);
 		okButton.setText("Add");
 		final Button cancelButton=new Button(this);
@@ -198,6 +199,11 @@ public class SuitcaseActivity extends Activity {
 		ll.addView(cancelButton);
 
 		newTab.addView(ll);
+		
+		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		newTab.addView(ruler,
+		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+		
 		
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 		tripContainer.addView(newTab, 0,lp);
