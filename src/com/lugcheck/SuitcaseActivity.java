@@ -62,7 +62,7 @@ public class SuitcaseActivity extends Activity {
 		tripContainer.addView(ruler,
 		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
-		
+		c.close();
 
 
 	} //end onCreate

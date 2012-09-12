@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -33,6 +34,7 @@ public class ItemActivity extends Activity {
 	SQLiteDatabase db; 
 	int suitcase_id;
 	int limit;
+
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class ItemActivity extends Activity {
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
 		limit=0;
-		
+	
     	Bundle extras = getIntent().getExtras();
 		suitcase_id = extras.getInt("suitcase_id"); // receiving trip_id from previous activity 
 		String bah= "In Item Class, suitcase_id is " + suitcase_id;
@@ -60,7 +62,7 @@ public class ItemActivity extends Activity {
 		tripContainer.addView(ruler,
 		new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
-		
+		c.close();
         
     }//end onCreate
 
@@ -139,17 +141,15 @@ public class ItemActivity extends Activity {
 			});
 
 
-
+			
 			/* Code below handles the situation where u click a item */
-		
+						
 			newTab.setOnClickListener(new Button.OnClickListener() {
-				public void onClick(View v) {
-
-					/* Add slashing in and out code */
+				public void onClick(View view) {
 					
 					
+					Log.w("SFSFD","SDFSDF");
 					
-
 				}});
 		}//end while*/
 		c.close();     

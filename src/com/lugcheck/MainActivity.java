@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
-	
+
 	static int limit; //limit to only creating one trip at a time
 	SQLiteDatabase db; 
 	private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
@@ -35,7 +35,9 @@ public class MainActivity extends Activity {
 	private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity text, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
 	//db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
 	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
+	private static final String READ_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS read_table(read text PRIMARY KEY);";
 	public static int TRIP_ID = 0;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,13 +51,45 @@ public class MainActivity extends Activity {
 		db.execSQL(TRIP_TABLE_CREATE);
 		db.execSQL(SUITCASE_TABLE_CREATE);
 		db.execSQL(ITEM_TABLE_CREATE);
-		
+		db.execSQL(READ_TABLE_CREATE);
 		/* code below just adds a black horizontal line*/
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 		tripContainer.addView(ruler,
-		 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();
+
+
+		/* Code below pops up dialogue explaining the app*/
+		Cursor c = db.rawQuery("SELECT * from read_table", null);
+
+		if(c.getCount()<= 0)
+		{
+			AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+			builder.setMessage("This app will help you to keep track of your travel checklist. Your checklist will be permanently saved onto your device so you can re-use it for future trips!")
+			.setTitle("Welcome!")
+			.setCancelable(false)
+			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();	 
+				}
+			})
+			.setNegativeButton("Do not show again", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					db.execSQL("INSERT INTO read_table (read) Values ('1');");
+					dialog.cancel();
+
+				}
+			});
+
+			AlertDialog alert = builder.create();
+			alert.show();
+
+		}
+
+		c.close();
+
+
 
 	}
 
@@ -96,12 +130,12 @@ public class MainActivity extends Activity {
 			newTab.setBackgroundColor(Color.WHITE);
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 			tripContainer.addView(newTab);
-			
+
 			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			tripContainer.addView(ruler,
-			 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
-			
-			
+					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+
+
 			c.moveToNext();
 
 
@@ -169,7 +203,7 @@ public class MainActivity extends Activity {
 		tripContainer.addView(addTrip);
 		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 		tripContainer.addView(ruler,
-		 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 		createLayoutsFromDB();	
 
 	}
@@ -199,9 +233,9 @@ public class MainActivity extends Activity {
 			newTab.addView(ll);
 			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			newTab.addView(ruler,
-			new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
-			
-			
+					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+
+
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 			tripContainer.addView(newTab, 0,lp);
 
@@ -209,7 +243,7 @@ public class MainActivity extends Activity {
 			okButton.setOnClickListener(new View.OnClickListener() { 
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
-				
+
 
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
 					EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
@@ -258,7 +292,7 @@ public class MainActivity extends Activity {
 						tripContainer.addView(addTrip);
 						View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 						tripContainer.addView(ruler,
-						 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+								new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 						createLayoutsFromDB();
 						}
 
@@ -293,7 +327,7 @@ public class MainActivity extends Activity {
 					tripContainer.addView(addTrip);
 					View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 					tripContainer.addView(ruler,
-					 new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+							new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
 					createLayoutsFromDB();
 
 				}
