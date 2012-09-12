@@ -142,13 +142,20 @@ public class ItemActivity extends Activity {
 
 
 			
-			/* Code below handles the situation where u click a item */
+			/* Code below handles the situation where u click a item and it slashes out */
 						
 			newTab.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View view) {
 					
+					LinearLayout ll= (LinearLayout) view;
+					TextView itemName = (TextView) ll.getChildAt(2);
+					Log.w("ItemName is ", itemName.toString());
 					
-					Log.w("SFSFD","SDFSDF");
+					if ((itemName.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0)
+						itemName.setPaintFlags( itemName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG)); 
+					else
+					itemName.setPaintFlags(itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG); 	
+					
 					
 				}});
 		}//end while*/
