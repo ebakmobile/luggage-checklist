@@ -17,7 +17,7 @@
         android:id="@+id/add_trip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/LightGoldenrodYellow"
+        android:background="@color/DarkSalmon"
         android:orientation="horizontal"
         android:onClick="addTrip">
 
