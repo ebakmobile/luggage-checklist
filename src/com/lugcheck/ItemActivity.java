@@ -142,7 +142,7 @@ public class ItemActivity extends Activity {
 
 
 			
-			/* Code below handles the situation where u click a item and it slashes out */
+			/* Code below handles the situation where u click a item */
 						
 			newTab.setOnClickListener(new Button.OnClickListener() {
 				public void onClick(View view) {
@@ -155,7 +155,29 @@ public class ItemActivity extends Activity {
 						itemName.setPaintFlags( itemName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG)); 
 					else
 					itemName.setPaintFlags(itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG); 	
+					ImageView im=new ImageView(ItemActivity.this);
+					im.setImageResource(R.drawable.checkmark); // creating a checkmark
+					// FROM STACKOVERFLOW!
+					float d = ItemActivity.this.getResources().getDisplayMetrics().density;
+					int width = (int)(58 * d);
+					int height = (int)(50 * d);
+					im.setLayoutParams(new LayoutParams(width, height));
+					int pad = (int)(5*d);
+					im.setPadding(pad, pad, 0, 0);
 					
+					
+					
+					if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) //removes slash
+					{	textBox.setPaintFlags( textBox.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+						layoutText.removeViewAt(3); // removes the checkmark icon
+						
+					}
+					
+					else  //adds the slash
+						{textBox.setPaintFlags(textBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG); 
+						layoutText.addView(im);
+						
+						}
 					
 				}});
 		}//end while*/

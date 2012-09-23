@@ -33,8 +33,6 @@ public class MainActivity extends Activity {
 	private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
 	private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer PRIMARY KEY autoincrement, suitcase_name text, trip_id INTEGER REFERENCES trip_table (trip_id) );";
 	private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity text, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
-	//db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
-	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
 	private static final String READ_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS read_table(read text PRIMARY KEY);";
 	public static int TRIP_ID = 0;
 
@@ -88,7 +86,6 @@ public class MainActivity extends Activity {
 		}
 
 		c.close();
-
 
 	}
 
