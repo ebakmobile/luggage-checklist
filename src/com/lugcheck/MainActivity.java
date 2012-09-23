@@ -90,7 +90,6 @@ public class MainActivity extends Activity {
 		c.close();
 
 
-
 	}
 
 
