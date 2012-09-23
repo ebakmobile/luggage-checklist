@@ -148,13 +148,8 @@ public class ItemActivity extends Activity {
 				public void onClick(View view) {
 					
 					LinearLayout ll= (LinearLayout) view;
-					TextView itemName = (TextView) ll.getChildAt(2);
-					Log.w("ItemName is ", itemName.toString());
-					
-					if ((itemName.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0)
-						itemName.setPaintFlags( itemName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG)); 
-					else
-					itemName.setPaintFlags(itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG); 	
+					TextView textBox = (TextView) ll.getChildAt(2);
+				
 					ImageView im=new ImageView(ItemActivity.this);
 					im.setImageResource(R.drawable.checkmark); // creating a checkmark
 					// FROM STACKOVERFLOW!
@@ -165,17 +160,16 @@ public class ItemActivity extends Activity {
 					int pad = (int)(5*d);
 					im.setPadding(pad, pad, 0, 0);
 					
-					
-					
+									
 					if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) //removes slash
 					{	textBox.setPaintFlags( textBox.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
-						layoutText.removeViewAt(3); // removes the checkmark icon
+						ll.removeViewAt(3); // removes the checkmark icon
 						
 					}
 					
 					else  //adds the slash
 						{textBox.setPaintFlags(textBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG); 
-						layoutText.addView(im);
+						ll.addView(im);
 						
 						}
 					
