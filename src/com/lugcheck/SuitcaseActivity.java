@@ -29,8 +29,6 @@ public class SuitcaseActivity extends Activity {
 	int trip_id;
 	SQLiteDatabase db; 
 	static int limit; //limit to only creating one trip at a time
-	//db.execSQL("INSERT INTO suitcase_table (suitcase_name, trip_id) Values ('suitcase test', 2)"); // insert into suticase_table db
-	//db.execSQL("INSERT INTO item_table (item_name, quantity, suitcase_id) Values ('item test', 100, 1)"); // insert into item_table db
 	public static int SUITCASE_ID = 0;
 
 	@Override
