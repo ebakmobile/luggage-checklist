@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 		tripContainer.addView(ruler,
-				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		createLayoutsFromDB();
 
 
@@ -129,7 +129,7 @@ public class MainActivity extends Activity {
 
 			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			tripContainer.addView(ruler,
-					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 
 			c.moveToNext();
@@ -199,7 +199,7 @@ public class MainActivity extends Activity {
 		tripContainer.addView(addTrip);
 		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 		tripContainer.addView(ruler,
-				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		createLayoutsFromDB();	
 
 	}
@@ -229,7 +229,8 @@ public class MainActivity extends Activity {
 			newTab.addView(ll);
 			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			newTab.addView(ruler,
-					new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+ new ViewGroup.LayoutParams(
+					ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
@@ -288,7 +289,7 @@ public class MainActivity extends Activity {
 						tripContainer.addView(addTrip);
 						View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 						tripContainer.addView(ruler,
-								new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+								new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 						createLayoutsFromDB();
 						}
 
@@ -323,7 +324,7 @@ public class MainActivity extends Activity {
 					tripContainer.addView(addTrip);
 					View ruler = new View(MainActivity.this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 					tripContainer.addView(ruler,
-							new ViewGroup.LayoutParams( ViewGroup.LayoutParams.FILL_PARENT, 2));
+							new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 					createLayoutsFromDB();
 
 				}
