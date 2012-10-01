@@ -12,4 +12,26 @@ public class Suitcase {
 		itemArray = new ArrayList<Item>();
 	}
 
+	public String getSuitcaseName() {
+		return suitcaseName;
+	}
+
+	public void setSuitcaseName(String suitcaseName) {
+		this.suitcaseName = suitcaseName;
+	}
+	
+	/*
+	 * IMPORTANT NOTE!!!
+	 * The getter/setter for the itemArray will return a reference to the object.
+	 * If we need to mutate the object (change the list's contents), then we need to
+	 * do object copying instead of just using the reference.
+	 */
+	public List<Item> getItemArray() {
+		return itemArray;
+	}
+
+	public void setItemArray(List<Item> itemArray) {
+		this.itemArray = itemArray;
+	}
+
 }
