@@ -3,13 +3,14 @@ package com.lugcheck.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Suitcase {
+public class Suitcase extends LugCheckObject {
 	
 	private String suitcaseName = null;
 	private List<Item> itemArray;
 	
 	public Suitcase() {
 		itemArray = new ArrayList<Item>();
+		type = ModelType.SUITCASE;
 	}
 
 	public String getSuitcaseName() {

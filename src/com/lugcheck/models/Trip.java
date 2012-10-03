@@ -3,9 +3,16 @@ package com.lugcheck.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Trip {
+public class Trip extends LugCheckObject {
 
-	private String tripName = null;
+	private String tripName;
+	private List<Suitcase> suitcaseArray;
+	
+	public Trip() {
+		suitcaseArray = new ArrayList<Suitcase>();
+		type = ModelType.TRIP;
+	}
+	
 	public String getTripName() {
 		return tripName;
 	}
@@ -26,12 +33,6 @@ public class Trip {
 	 */
 	public void setSuitcaseArray(List<Suitcase> suitcaseArray) {
 		this.suitcaseArray = suitcaseArray;
-	}
-
-	private List<Suitcase> suitcaseArray;
-
-	public Trip() {
-		suitcaseArray = new ArrayList<Suitcase>();
 	}
 
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import com.lugcheck.models.LugCheckObject;
 
 public class DAOImpl implements DAO {
 	
@@ -29,6 +30,22 @@ public class DAOImpl implements DAO {
 
 	public void setup(Context context) throws DBException {
 		dbHelper = DBHelper.getInstance(context, DB_NAME, DB_VERSION);
+	}
+
+	public void insertObject(LugCheckObject obj) {
+		switch (obj.getType()) {
+		case ITEM:
+			// insert an item
+			break;
+		case SUITCASE:
+			// insert a suitcase
+			break;
+		case TRIP:
+			// insert a trip
+			break;
+		default:
+			// ERROR
+		}
 	}
 	
 }

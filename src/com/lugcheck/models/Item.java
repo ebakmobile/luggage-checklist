@@ -1,6 +1,6 @@
 package com.lugcheck.models;
 
-public class Item {
+public class Item extends LugCheckObject {
 	
 	private String itemName = null;
 	private int quantity;
@@ -8,6 +8,7 @@ public class Item {
 	public Item() {
 		// default quantity to 1
 		quantity = 1;
+		type = ModelType.ITEM;
 	}
 
 	public String getItemName() {
