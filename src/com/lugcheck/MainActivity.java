@@ -2,10 +2,6 @@ package com.lugcheck;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
-
-import java.util.Locale;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -25,38 +21,39 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.inject.Injector;
+import com.lugcheck.db.DAO;
+import com.lugcheck.db.DBException;
+import com.lugcheck.guice.GuiceManager;
 
 public class MainActivity extends Activity {
 
 	static int limit; //limit to only creating one trip at a time
 	SQLiteDatabase db; 
-	private static final String TRIP_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS trip_table(trip_id integer PRIMARY KEY autoincrement, trip_name text);";
-	private static final String SUITCASE_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS suitcase_table(suitcase_id integer PRIMARY KEY autoincrement, suitcase_name text, trip_id INTEGER REFERENCES trip_table (trip_id) );";
-	private static final String ITEM_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS item_table(item_id integer PRIMARY KEY autoincrement, item_name text, quantity text, suitcase_id INTEGER REFERENCES suitcase_table(suitcase_id)) ;";
-	private static final String READ_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS read_table(read text PRIMARY KEY);";
 	public static int TRIP_ID = 0;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		GuiceManager.getInitialInstance(this);
 		setContentView(R.layout.activity_main);
 		limit=0;
-		db=openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
-		db.setVersion(1);
-		db.setLocale(Locale.getDefault());
-		db.execSQL(TRIP_TABLE_CREATE);
-		db.execSQL(SUITCASE_TABLE_CREATE);
-		db.execSQL(ITEM_TABLE_CREATE);
-		db.execSQL(READ_TABLE_CREATE);
+		
+		try {
+			initDb();
+		} catch (DBException e) {
+			e.printStackTrace();
+			// Close because of error
+			System.exit(1);
+		}
+
 		/* code below just adds a black horizontal line*/
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 		View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 		tripContainer.addView(ruler,
 				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		createLayoutsFromDB();
-
 
 		/* Code below pops up dialogue explaining the app*/
 		Cursor c = db.rawQuery("SELECT * from read_table", null);
@@ -79,18 +76,18 @@ public class MainActivity extends Activity {
 
 				}
 			});
-
 			AlertDialog alert = builder.create();
 			alert.show();
-
 		}
-
 		c.close();
-
 	}
 
-
-
+	public void initDb() throws DBException {
+		Injector injector = GuiceManager.getInstance().getInjector();
+		DAO dao = injector.getInstance(DAO.class);
+		dao.setup(this);
+	}
+	
 	public void createLayoutsFromDB()
 	{
 
@@ -118,7 +115,6 @@ public class MainActivity extends Activity {
 			int txtPadding=(int)(20*d);
 			hw.setPadding(0, txtPadding, 0, 0);
 
-
 			LinearLayout newTab =new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.HORIZONTAL);
 			newTab.addView(im);
@@ -133,8 +129,6 @@ public class MainActivity extends Activity {
 
 
 			c.moveToNext();
-
-
 
 			/*Code Below handles the delete situation*/
 			final String text2=text;
@@ -160,9 +154,6 @@ public class MainActivity extends Activity {
 					return true;	
 				}
 			});
-
-
-
 			/* Code below handles the situation where u click a trip */
 			final int trip_id2=trip_id;
 			newTab.setOnClickListener(new Button.OnClickListener() {
@@ -173,19 +164,10 @@ public class MainActivity extends Activity {
 					startActivity(intent);
 
 				}});
-
-
-
-
-
 		}//end while*/
-
-
 		c.close();
 
 	}//end method
-
-
 
 	public void deleteFromDB(String i)
 	{
@@ -201,12 +183,9 @@ public class MainActivity extends Activity {
 		tripContainer.addView(ruler,
 				new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		createLayoutsFromDB();	
-
 	}
 
 	public void addTrip(View view) {
-
-
 		if (limit==0)//checking to make sure there is no open layouts 
 		{ 
 			limit =1;
@@ -229,9 +208,8 @@ public class MainActivity extends Activity {
 			newTab.addView(ll);
 			View ruler = new View(this); ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			newTab.addView(ruler,
- new ViewGroup.LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT, 2));
-
+					new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 			tripContainer.addView(newTab, 0,lp);
@@ -306,10 +284,7 @@ public class MainActivity extends Activity {
 
 							dupe.show();
 
-
-
 						}//end else
-
 
 					}
 				}
@@ -329,17 +304,7 @@ public class MainActivity extends Activity {
 
 				}
 			});
-
-
-
 		}
-
 	}
 
-
-
-
 }
-
-
-

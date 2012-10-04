@@ -7,18 +7,23 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
 	
 	//private final String DB_NAME;
 	private final int DB_CURRENT_VERSION;
 	
+	private Context context;
+	
 	private static DBHelper thisInstance = null;
 	
 	private DBHelper(Context context, String dbName, int dbVersion) {
 		super(context, dbName, null, dbVersion);
-		//DB_NAME = dbName;
+		this.context = context;
 		DB_CURRENT_VERSION = dbVersion;
+		// Create the database by getting a writable DB
+		getWritableDatabase();
 	}
 	
 	public static DBHelper getInstance(Context context, String dbName, int dbVersion) {
@@ -30,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		List<String> statements = DBUtil.getStatementsFromSqlFile("database/create/create-"
+		List<String> statements = DBUtil.getStatementsFromSqlFile(context, "database/create/schema-"
 				+ DB_CURRENT_VERSION + ".sql");
 		executeStatements(statements, db);
 	}

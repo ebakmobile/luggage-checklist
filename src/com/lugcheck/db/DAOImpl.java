@@ -25,7 +25,7 @@ public class DAOImpl implements DAO {
 			Log.e("DB Error", "An illegal version number was used in the db properties file. " +
 					"A non-numeric value was probably used.");
 		}
-		DB_VERSION = tempVersion;	// Set to this value to signify an error;
+		DB_VERSION = tempVersion;
 	}
 
 	public void setup(Context context) throws DBException {

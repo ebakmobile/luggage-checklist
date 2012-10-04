@@ -1,10 +1,14 @@
 package com.lugcheck.db;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Context;
+
+import com.lugcheck.util.AppUtil;
 
 /**
  * Contains static helper methods for database code.
@@ -25,17 +29,18 @@ public class DBUtil {
 	 * @param filename the filename
 	 * @return the statements from sql file
 	 */
-	public static List<String> getStatementsFromSqlFile(String filename) {
+	public static List<String> getStatementsFromSqlFile(Context context, String filename) {
 		BufferedReader reader = null;
 		StringBuilder fileContents = new StringBuilder();
 		try {
-			reader = new BufferedReader(new FileReader(filename));
+			reader = new BufferedReader(new InputStreamReader(AppUtil.getInputStreamFromAssets(context, filename)));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				fileContents.append(line).append(" ");
 				// NO NEWLINES IN THE fileContents!!!
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException();
 		} finally {
 			if (reader != null) {
