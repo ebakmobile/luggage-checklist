@@ -5,14 +5,29 @@ import java.util.List;
 
 public class Trip extends LugCheckObject {
 
+	private int tripId;
 	private String tripName;
 	private List<Suitcase> suitcaseArray;
-	
+
 	public Trip() {
+		super(ModelType.TRIP);
 		suitcaseArray = new ArrayList<Suitcase>();
-		type = ModelType.TRIP;
 	}
-	
+
+	public Trip(int tripId, String tripName) {
+		super(ModelType.TRIP);
+		this.tripId = tripId;
+		this.tripName = tripName;
+	}
+
+	public int getTripId() {
+		return tripId;
+	}
+
+	public void setTripId(int tripId) {
+		this.tripId = tripId;
+	}
+
 	public String getTripName() {
 		return tripName;
 	}
@@ -26,10 +41,8 @@ public class Trip extends LugCheckObject {
 	}
 
 	/*
-	 * IMPORTANT NOTE!!!
-	 * The getter/setter for the itemArray will return a reference to the object.
-	 * If we need to mutate the object (change the list's contents), then we need to
-	 * do object copying instead of just using the reference.
+	 * IMPORTANT NOTE!!! The getter/setter for the itemArray will return a reference to the object. If we need to mutate the object (change the list's contents), then we need to do object copying
+	 * instead of just using the reference.
 	 */
 	public void setSuitcaseArray(List<Suitcase> suitcaseArray) {
 		this.suitcaseArray = suitcaseArray;
