@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS Item(
 	item_name TEXT NOT NULL,
 	quantity INTEGER NOT NULL,
 	suitcase_id INTEGER REFERENCES Suitcase(suitcase_id),
+	is_slashed INTEGER NOT NULL,
 	UNIQUE (item_name, suitcase_id)) ;
 	
 CREATE TABLE IF NOT EXISTS Read(

@@ -66,6 +66,7 @@ public class ItemActivity extends Activity {
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
+			int isSlashed = c.getInt(c.getColumnIndex("is_slashed"));
 			TextView hw = new TextView(this);
 			String text = c.getString(c.getColumnIndex("item_name"));
 			int ITEM_ID = c.getInt(c.getColumnIndex("item_id"));
@@ -76,90 +77,211 @@ public class ItemActivity extends Activity {
 			qtext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
 			qtext.setText(quant);
 
-			ImageView im = new ImageView(this);
-			im.setImageResource(R.drawable.tshirt);
-			// FROM STACKOVERFLOW!
-			float d = this.getResources().getDisplayMetrics().density;
-			int width = (int) (58 * d);
-			int height = (int) (50 * d);
-			im.setLayoutParams(new LayoutParams(width, height));
-			int pad = (int) (5 * d);
-			im.setPadding(pad, pad, 0, 0);
-			// END
-			int txtPadding = (int) (20 * d);
-			hw.setPadding(0, txtPadding, 0, 0);
+			if (isSlashed == 1) { // omg this is dirty. But I just copied and pasted the code from the else, with slight revisions. This section draws a slashed out item tab
+				hw.setPaintFlags(hw.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-			LinearLayout newTab = new LinearLayout(this);
-			newTab.setOrientation(LinearLayout.HORIZONTAL);
-			newTab.addView(im);
-			newTab.addView(qtext);
-			newTab.addView(hw);
-			newTab.setBackgroundColor(Color.WHITE);
-			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+				ImageView checkmarkImage = new ImageView(ItemActivity.this);
+				checkmarkImage.setImageResource(R.drawable.checkmark); // creating a checkmark
+				// FROM STACKOVERFLOW!
+				float d = ItemActivity.this.getResources().getDisplayMetrics().density;
+				int width = (int) (58 * d);
+				int height = (int) (50 * d);
+				checkmarkImage.setLayoutParams(new LayoutParams(width, height));
+				int pad = (int) (5 * d);
+				checkmarkImage.setPadding(pad, pad, 0, 0);
 
-			tripContainer.addView(newTab);
-			View ruler = new View(this);
-			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-			tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-					ViewGroup.LayoutParams.MATCH_PARENT, 2));
-			c.moveToNext();
+				ImageView im = new ImageView(this);
+				im.setImageResource(R.drawable.tshirt);
+				// FROM STACKOVERFLOW!
 
-			/* Code Below handles the delete situation */
-			final String text2 = text;
-			newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
-				public boolean onLongClick(View v) {
+				im.setLayoutParams(new LayoutParams(width, height));
+				im.setPadding(pad, pad, 0, 0);
+				// END
+				int txtPadding = (int) (20 * d);
+				hw.setPadding(0, txtPadding, 0, 0);
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-					builder.setMessage("Are you sure you want delete?").setCancelable(false)
-							.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									deleteFromDB(text2, suitcaseId);
-								}
-							}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.cancel();
-								}
-							});
+				LinearLayout newTab = new LinearLayout(this);
+				newTab.setOrientation(LinearLayout.HORIZONTAL);
+				newTab.addView(im);
+				newTab.addView(qtext);
+				newTab.addView(hw);
+				newTab.addView(checkmarkImage);
+				newTab.setBackgroundColor(Color.WHITE);
+				LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
 
-					AlertDialog alert = builder.create();
-					alert.show();
-					return true;
-				}
-			});
+				tripContainer.addView(newTab);
+				View ruler = new View(this);
+				ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+				tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+						ViewGroup.LayoutParams.MATCH_PARENT, 2));
+				c.moveToNext();
 
-			/* Code below handles the situation where u click a item */
+				/* Code Below handles the delete situation */
+				final String text2 = text;
+				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
+					public boolean onLongClick(View v) {
 
-			newTab.setOnClickListener(new Button.OnClickListener() {
-				public void onClick(View view) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						builder.setMessage("Are you sure you want delete?").setCancelable(false)
+								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										deleteFromDB(text2, suitcaseId);
+									}
+								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.cancel();
+									}
+								});
 
-					LinearLayout ll = (LinearLayout) view;
-					TextView textBox = (TextView) ll.getChildAt(2);
-
-					ImageView im = new ImageView(ItemActivity.this);
-					im.setImageResource(R.drawable.checkmark); // creating a checkmark
-					// FROM STACKOVERFLOW!
-					float d = ItemActivity.this.getResources().getDisplayMetrics().density;
-					int width = (int) (58 * d);
-					int height = (int) (50 * d);
-					im.setLayoutParams(new LayoutParams(width, height));
-					int pad = (int) (5 * d);
-					im.setPadding(pad, pad, 0, 0);
-
-					if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) // removes slash
-					{
-						textBox.setPaintFlags(textBox.getPaintFlags()
-								& (~Paint.STRIKE_THRU_TEXT_FLAG));
-						ll.removeViewAt(3); // removes the checkmark icon
-
+						AlertDialog alert = builder.create();
+						alert.show();
+						return true;
 					}
+				});
 
-					else // adds the slash
-					{
-						textBox.setPaintFlags(textBox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-						ll.addView(im);
+				/* Code below handles the situation where u click a item */
+
+				final int item_id2 = ITEM_ID;
+
+				newTab.setOnClickListener(new Button.OnClickListener() {
+					public void onClick(View view) {
+
+						LinearLayout ll = (LinearLayout) view;
+						TextView textBox = (TextView) ll.getChildAt(2);
+
+						ImageView im = new ImageView(ItemActivity.this);
+						im.setImageResource(R.drawable.checkmark); // creating a checkmark
+						// FROM STACKOVERFLOW!
+						float d = ItemActivity.this.getResources().getDisplayMetrics().density;
+						int width = (int) (58 * d);
+						int height = (int) (50 * d);
+						im.setLayoutParams(new LayoutParams(width, height));
+						int pad = (int) (5 * d);
+						im.setPadding(pad, pad, 0, 0);
+
+						if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) // removes slash
+						{
+							textBox.setPaintFlags(textBox.getPaintFlags()
+									& (~Paint.STRIKE_THRU_TEXT_FLAG));
+							ll.removeViewAt(3); // removes the checkmark icon
+
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id ='"
+									+ item_id2 + "'";
+							db.execSQL(UPDATE_STATEMENT);
+
+						}
+
+						else // adds the slash
+						{
+							textBox.setPaintFlags(textBox.getPaintFlags()
+									| Paint.STRIKE_THRU_TEXT_FLAG);
+							ll.addView(im);
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id='"
+									+ item_id2 + "'";
+							db.execSQL(UPDATE_STATEMENT);
+						}
 					}
-				}
-			});
+				});
+
+			}
+
+			else { //add a non-slashed out item tab
+				ImageView im = new ImageView(this);
+				im.setImageResource(R.drawable.tshirt);
+				// FROM STACKOVERFLOW!
+				float d = this.getResources().getDisplayMetrics().density;
+				int width = (int) (58 * d);
+				int height = (int) (50 * d);
+				im.setLayoutParams(new LayoutParams(width, height));
+				int pad = (int) (5 * d);
+				im.setPadding(pad, pad, 0, 0);
+				// END
+				int txtPadding = (int) (20 * d);
+				hw.setPadding(0, txtPadding, 0, 0);
+
+				LinearLayout newTab = new LinearLayout(this);
+				newTab.setOrientation(LinearLayout.HORIZONTAL);
+				newTab.addView(im);
+				newTab.addView(qtext);
+				newTab.addView(hw);
+				newTab.setBackgroundColor(Color.WHITE);
+				LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+
+				tripContainer.addView(newTab);
+				View ruler = new View(this);
+				ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+				tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+						ViewGroup.LayoutParams.MATCH_PARENT, 2));
+				c.moveToNext();
+
+				/* Code Below handles the delete situation */
+				final String text2 = text;
+				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
+					public boolean onLongClick(View v) {
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						builder.setMessage("Are you sure you want delete?").setCancelable(false)
+								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										deleteFromDB(text2, suitcaseId);
+									}
+								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.cancel();
+									}
+								});
+
+						AlertDialog alert = builder.create();
+						alert.show();
+						return true;
+					}
+				});
+
+				/* Code below handles the situation where u click a item */
+
+				final int item_id2 = ITEM_ID;
+
+				newTab.setOnClickListener(new Button.OnClickListener() {
+					public void onClick(View view) {
+
+						LinearLayout ll = (LinearLayout) view;
+						TextView textBox = (TextView) ll.getChildAt(2);
+
+						ImageView im = new ImageView(ItemActivity.this);
+						im.setImageResource(R.drawable.checkmark); // creating a checkmark
+						// FROM STACKOVERFLOW!
+						float d = ItemActivity.this.getResources().getDisplayMetrics().density;
+						int width = (int) (58 * d);
+						int height = (int) (50 * d);
+						im.setLayoutParams(new LayoutParams(width, height));
+						int pad = (int) (5 * d);
+						im.setPadding(pad, pad, 0, 0);
+
+						if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) // removes slash
+						{
+							textBox.setPaintFlags(textBox.getPaintFlags()
+									& (~Paint.STRIKE_THRU_TEXT_FLAG));
+							ll.removeViewAt(3); // removes the checkmark icon
+
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id ='"
+									+ item_id2 + "'";
+							db.execSQL(UPDATE_STATEMENT);
+
+						}
+
+						else // adds the slash
+						{
+							textBox.setPaintFlags(textBox.getPaintFlags()
+									| Paint.STRIKE_THRU_TEXT_FLAG);
+							ll.addView(im);
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id='"
+									+ item_id2 + "'";
+							db.execSQL(UPDATE_STATEMENT);
+						}
+					}
+				});
+
+			}//end else 		
 		}// end while*/
 		c.close();
 	} // end method
@@ -296,8 +418,8 @@ public class ItemActivity extends Activity {
 						c.close();
 
 						if (isDupe == false) {
-							String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id) Values ('"
-									+ itemName + "', '" + quantity + "','" + suitcaseId + "')";
+							String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
+									+ itemName + "', '" + quantity + "','" + suitcaseId + "','0')";
 							db.execSQL(INSERT_STATEMENT); // insert into
 															// item_table db
 							limit = 0; // allow to recreate a new trip
