@@ -438,8 +438,7 @@ public class ItemActivity extends Activity {
 							ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 									ViewGroup.LayoutParams.MATCH_PARENT, 2));
-
-							//createLayoutsFromDB();
+							createLayoutsFromDB();
 						}
 
 						else {
@@ -471,7 +470,7 @@ public class ItemActivity extends Activity {
 															// the black lines
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
-					//createLayoutsFromDB();
+					createLayoutsFromDB();
 
 				}
 			});
