@@ -1,8 +1,5 @@
 package com.lugcheck;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 import java.util.Locale;
 
 import android.app.Activity;
@@ -304,12 +301,17 @@ public class ItemActivity extends Activity {
 
 	}
 
-	public void addItem(View view) {
+	public void addItem(View view) {// go to add activity screen
+
+		/*Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
+		intent.putExtra("suitcase_id", suitcaseId);
+		startActivity(intent);*/
 
 		if (limit == 0)// checking to make sure there is no open layouts
 		{
 			limit = 1;
-			LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+
+			LayoutParams lp = new LayoutParams(-1, -2);
 			final LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.VERTICAL);
 			final EditText hw = new EditText(this);
@@ -318,15 +320,19 @@ public class ItemActivity extends Activity {
 			quantity.setHint("Enter Quantity");
 			final Button okButton = new Button(this);
 			okButton.setText("Add");
-			final Button cancelButton = new Button(this);
+			Button cancelButton = new Button(this);
 			cancelButton.setText("Cancel");
 			LinearLayout ll = new LinearLayout(this);
+			LinearLayout horizontalButtons = new LinearLayout(this);
+			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
+			LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.MATCH_PARENT, 1.0f); //param sets it so the width is 50% horizontally. Looked nicer!
+			horizontalButtons.addView(okButton, param);
+			horizontalButtons.addView(cancelButton, param);
 			ll.setOrientation(LinearLayout.VERTICAL);
 			ll.addView(hw);
 			ll.addView(quantity);
-			ll.addView(okButton);
-			ll.addView(cancelButton);
-
+			ll.addView(horizontalButtons);
 			newTab.addView(ll);
 
 			View ruler = new View(this);
@@ -337,12 +343,12 @@ public class ItemActivity extends Activity {
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
 			tripContainer.addView(newTab, 0, lp);
 
-			// Code below is for adding a item to the database
+			//Code below is for adding a item to the database
 			okButton.setOnClickListener(new View.OnClickListener() {
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
 
-					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
+					LinearLayout buttonParent = (LinearLayout) okButton.getParent().getParent(); // had to do this twice cos of the horizontal layer addition
 					EditText textBoxItemName = (EditText) buttonParent.getChildAt(0);// gets value of textbox
 					EditText textBoxQuantity = (EditText) buttonParent.getChildAt(1);
 
@@ -432,7 +438,8 @@ public class ItemActivity extends Activity {
 							ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 									ViewGroup.LayoutParams.MATCH_PARENT, 2));
-							createLayoutsFromDB();
+
+							//createLayoutsFromDB();
 						}
 
 						else {
@@ -464,7 +471,7 @@ public class ItemActivity extends Activity {
 															// the black lines
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
-					createLayoutsFromDB();
+					//createLayoutsFromDB();
 
 				}
 			});
@@ -484,5 +491,4 @@ public class ItemActivity extends Activity {
 		}
 		return result;
 	}
-
 } // end activity

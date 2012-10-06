@@ -34,6 +34,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.lugcheck.MainActivity" />
         </activity>
+        <activity
+            android:name=".AddItemActivity"
+            android:label="@string/title_activity_add_item" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.lugcheck.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
