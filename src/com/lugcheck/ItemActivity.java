@@ -39,7 +39,7 @@ public class ItemActivity extends Activity {
 		limit = 0;
 
 		Bundle extras = getIntent().getExtras();
-		suitcaseId = extras.getInt("suitcase_id"); // receiving trip_id from previous activity
+		suitcaseId = extras.getInt("suitcase_id"); // receiving suitcase_id from previous activity
 
 		/* code below is to set the activity title to the trip_name */
 		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
@@ -89,7 +89,7 @@ public class ItemActivity extends Activity {
 				checkmarkImage.setPadding(pad, pad, 0, 0);
 
 				ImageView im = new ImageView(this);
-				im.setImageResource(R.drawable.tshirt);
+				im.setImageResource(R.drawable.opensuitcase);
 				// FROM STACKOVERFLOW!
 
 				im.setLayoutParams(new LayoutParams(width, height));
@@ -185,7 +185,7 @@ public class ItemActivity extends Activity {
 
 			else { //add a non-slashed out item tab
 				ImageView im = new ImageView(this);
-				im.setImageResource(R.drawable.tshirt);
+				im.setImageResource(R.drawable.opensuitcase);
 				// FROM STACKOVERFLOW!
 				float d = this.getResources().getDisplayMetrics().density;
 				int width = (int) (58 * d);

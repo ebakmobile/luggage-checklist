@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -13,8 +16,11 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class AddItemActivity extends Activity {
@@ -35,7 +41,7 @@ public class AddItemActivity extends Activity {
 		suitcaseId = extras.getInt("suitcase_id");
 		Log.w("Suitcase id is ", " " + suitcaseId);
 		limit = 0;
-
+		setTitle("Quick Add");
 		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
 		if (c.getCount() <= 0) {// if there is nothing in the QuickAdd Table
 
@@ -43,7 +49,7 @@ public class AddItemActivity extends Activity {
 
 			for (int i = 0; i < insertList.size(); i++) {
 				String tempName = insertList.get(i);
-				Log.w("tempName is  ", tempName);
+				//Log.w("tempName is  ", tempName);
 				String INSERT_STATEMENT = "INSERT INTO QuickAdd (name) Values ('" + tempName + "')";
 				db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 			}
@@ -62,7 +68,7 @@ public class AddItemActivity extends Activity {
 		while (c.isAfterLast() == false) {
 
 			TextView hw = new TextView(this);
-			String text = c.getString(c.getColumnIndex("name"));
+			final String text = c.getString(c.getColumnIndex("name"));
 			hw.setText(text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			ImageView im = new ImageView(this);
@@ -78,23 +84,70 @@ public class AddItemActivity extends Activity {
 			int txtPadding = (int) (20 * d);
 			hw.setPadding(0, txtPadding, 0, 0);
 
+			Button addButton = new Button(this);
+			addButton.setText("Add");
+			RelativeLayout relativeLayoutAdd = new RelativeLayout(this); // put the add button on this relative layout to push to the right
 			LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.HORIZONTAL);
+			RelativeLayout.LayoutParams paramRight = new RelativeLayout.LayoutParams(
+					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			paramRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
 			newTab.addView(im);
 			newTab.addView(hw);
+			relativeLayoutAdd.addView(addButton, paramRight);
+			newTab.addView(relativeLayoutAdd);//add the relative layout onto the newTab layout
 			newTab.setBackgroundColor(Color.WHITE);
-			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+
+			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.add_item_container);
 			tripContainer.addView(newTab);
 
 			View ruler = new View(this);
 			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 					ViewGroup.LayoutParams.MATCH_PARENT, 2));
-
 			c.moveToNext();
 
-		}
-	}
+			addButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					final EditText quantityEditText = new EditText(AddItemActivity.this);
+					quantityEditText.setHint("Quantity");
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
+					builder.setMessage("Please enter a quantity for " + text).setCancelable(false)
+							.setView(quantityEditText)
+							.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {// when they click "add" after entering quantity
+
+									String quantity = quantityEditText.getText().toString();
+									String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
+											+ text
+											+ "', '"
+											+ quantity
+											+ "','"
+											+ suitcaseId
+											+ "','0')";
+									db.execSQL(INSERT_STATEMENT);
+									Intent intent = new Intent(AddItemActivity.this,
+											ItemActivity.class);
+									intent.putExtra("suitcase_id", suitcaseId);
+									startActivity(intent);
+
+								}//end and moves onto the setNegative
+							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.cancel();
+								}//end setNegativeButton Onclick
+							});//end setNegativeButton
+
+					AlertDialog alert = builder.create();
+					alert.show();
+
+				}//end addButton on(ClickViewV)
+			}); //end addButton.setOnClickListener
+
+		}//end while
+
+	}//end method 
 
 	public void addIntoArrayList() {
 		insertList.add("Shoes");
@@ -138,4 +191,14 @@ public class AddItemActivity extends Activity {
 		insertList.add("Fanny Pack");
 	}
 
+	public boolean isInteger(String s) {
+		boolean result = false;
+		try {
+			Integer.parseInt("-1234");
+			result = true;
+		} catch (NumberFormatException nfe) {
+			// no need to handle the exception
+		}
+		return result;
+	}
 }
