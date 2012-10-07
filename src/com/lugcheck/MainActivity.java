@@ -207,10 +207,16 @@ public class MainActivity extends Activity {
 			cancelButton.setText("Cancel");
 
 			LinearLayout ll = new LinearLayout(this);
-			ll.setOrientation(LinearLayout.HORIZONTAL);
+			ll.setOrientation(LinearLayout.VERTICAL);
 			ll.addView(hw);
-			ll.addView(okButton);
-			ll.addView(cancelButton);
+
+			LinearLayout horizontalButtons = new LinearLayout(this);
+			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
+			LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.MATCH_PARENT, 1.0f); //param sets it so the width is 50% horizontally. Looked nicer!
+			horizontalButtons.addView(okButton, param);
+			horizontalButtons.addView(cancelButton, param);
+			ll.addView(horizontalButtons);
 
 			newTab.addView(ll);
 			View ruler = new View(this);
@@ -226,7 +232,7 @@ public class MainActivity extends Activity {
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
 
-					LinearLayout buttonParent = (LinearLayout) okButton.getParent();
+					LinearLayout buttonParent = (LinearLayout) okButton.getParent().getParent();
 					EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
 					String tripName = textBox.getText().toString();
 

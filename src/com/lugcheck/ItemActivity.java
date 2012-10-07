@@ -5,11 +5,13 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnLongClickListener;
@@ -38,7 +40,6 @@ public class ItemActivity extends Activity {
 
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id"); // receiving trip_id from previous activity
-		String bah = "In Item Class, suitcase_id is " + suitcaseId; // Please use better variable names!
 
 		/* code below is to set the activity title to the trip_name */
 		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
@@ -322,6 +323,8 @@ public class ItemActivity extends Activity {
 			okButton.setText("Add");
 			Button cancelButton = new Button(this);
 			cancelButton.setText("Cancel");
+			Button quickAddButton = new Button(this);
+			quickAddButton.setText("Quick Add...");
 			LinearLayout ll = new LinearLayout(this);
 			LinearLayout horizontalButtons = new LinearLayout(this);
 			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
@@ -333,6 +336,7 @@ public class ItemActivity extends Activity {
 			ll.addView(hw);
 			ll.addView(quantity);
 			ll.addView(horizontalButtons);
+			ll.addView(quickAddButton);
 			newTab.addView(ll);
 
 			View ruler = new View(this);
@@ -343,7 +347,17 @@ public class ItemActivity extends Activity {
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
 			tripContainer.addView(newTab, 0, lp);
 
-			//Code below is for adding a item to the database
+			quickAddButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
+					intent.putExtra("suitcase_id", suitcaseId);
+					Log.w("sending over suitcase id: ", " " + suitcaseId);
+					startActivity(intent);
+
+				}
+			});
+
+			//Code below is for clicking add or cancel button
 			okButton.setOnClickListener(new View.OnClickListener() {
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
@@ -351,10 +365,10 @@ public class ItemActivity extends Activity {
 					LinearLayout buttonParent = (LinearLayout) okButton.getParent().getParent(); // had to do this twice cos of the horizontal layer addition
 					EditText textBoxItemName = (EditText) buttonParent.getChildAt(0);// gets value of textbox
 					EditText textBoxQuantity = (EditText) buttonParent.getChildAt(1);
-
 					String itemName = textBoxItemName.getText().toString();
 					String quantity = textBoxQuantity.getText().toString();
 
+					Log.w("SFDFS", "itemName is " + itemName + "quantity is" + quantity);
 					if (quantity.equals("") && itemName.equals("")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("Please enter a valid name and quantity");
@@ -423,17 +437,16 @@ public class ItemActivity extends Activity {
 
 						c.close();
 
-						if (isDupe == false) {
+						if (isDupe == false) {// it will successfully insert item into db table
 							String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
 									+ itemName + "', '" + quantity + "','" + suitcaseId + "','0')";
 							db.execSQL(INSERT_STATEMENT); // insert into
 															// item_table db
 							limit = 0; // allow to recreate a new trip
-
 							LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
-							LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+							LinearLayout addTrip1 = (LinearLayout) findViewById(R.id.add_item);
 							tripContainer.removeAllViews();
-							tripContainer.addView(addTrip);
+							tripContainer.addView(addTrip1);
 							View ruler = new View(ItemActivity.this);
 							ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(

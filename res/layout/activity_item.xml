@@ -35,11 +35,8 @@
             android:paddingTop="20dp"
             android:text="Add New Item"
             android:textSize="16sp"/>
-    </LinearLayout>
+  </LinearLayout>
 
-
-    
-    
 </LinearLayout>
 
 </ScrollView>
