@@ -63,7 +63,7 @@ public class AddItemActivity extends Activity {
 	public void createLayoutsFromDB() {
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
-		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
+		Cursor c = db.rawQuery("SELECT * from QuickAdd ORDER BY name", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
@@ -117,20 +117,69 @@ public class AddItemActivity extends Activity {
 							.setView(quantityEditText)
 							.setPositiveButton("Add", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {// when they click "add" after entering quantity
-
 									String quantity = quantityEditText.getText().toString();
-									String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
-											+ text
-											+ "', '"
-											+ quantity
-											+ "','"
-											+ suitcaseId
-											+ "','0')";
-									db.execSQL(INSERT_STATEMENT);
-									Intent intent = new Intent(AddItemActivity.this,
-											ItemActivity.class);
-									intent.putExtra("suitcase_id", suitcaseId);
-									startActivity(intent);
+									boolean isDupe = false;//code below checks for dupes in database
+									Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
+											+ suitcaseId + "'", null);
+									c.moveToFirst();
+
+									while (c.isAfterLast() == false) {
+										String itemName = c.getString(c.getColumnIndex("item_name"));
+										c.moveToNext();
+										if (text.equals(itemName)) {
+											isDupe = true;
+											break;
+										}
+									}
+
+									c.close();
+
+									if (!quantity.matches("\\d+")) {
+										AlertDialog dupe = new AlertDialog.Builder(
+												AddItemActivity.this).create();
+										dupe.setMessage("Please enter a numeric value for 'Quantity'");
+										dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog, int which) {
+											}
+										});
+
+										dupe.show();
+
+									}// end if(!quantity.matches(//d+)
+
+									else {
+										if (isDupe == true) {//if there is a duplicate
+											AlertDialog dupe = new AlertDialog.Builder(
+													AddItemActivity.this).create();
+											dupe.setTitle("Duplicate Found");
+											dupe.setMessage("Item already exists. Please use that item instead");
+											dupe.setButton("Ok",
+													new DialogInterface.OnClickListener() {
+														public void onClick(DialogInterface dialog,
+																int which) {
+														}
+													});
+
+											dupe.show();
+
+										}
+
+										else {
+											String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
+
+													+ text
+													+ "', '"
+													+ quantity
+													+ "','"
+													+ suitcaseId
+													+ "','0')";
+											db.execSQL(INSERT_STATEMENT);
+											Intent intent = new Intent(AddItemActivity.this,
+													ItemActivity.class);
+											intent.putExtra("suitcase_id", suitcaseId);
+											startActivity(intent);
+										}//end else of inserting into db
+									} //insert into DB bracket
 
 								}//end and moves onto the setNegative
 							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -368,7 +368,6 @@ public class ItemActivity extends Activity {
 					String itemName = textBoxItemName.getText().toString();
 					String quantity = textBoxQuantity.getText().toString();
 
-					Log.w("SFDFS", "itemName is " + itemName + "quantity is" + quantity);
 					if (quantity.equals("") && itemName.equals("")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("Please enter a valid name and quantity");
@@ -458,7 +457,7 @@ public class ItemActivity extends Activity {
 
 							AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 							dupe.setTitle("Duplicate Found");
-							dupe.setMessage("Item name already exists. Please use that item instead");
+							dupe.setMessage("Item already exists. Please use that item instead");
 							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int which) {
 								}
