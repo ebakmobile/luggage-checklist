@@ -178,6 +178,8 @@ public class AddItemActivity extends Activity {
 													ItemActivity.class);
 											intent.putExtra("suitcase_id", suitcaseId);
 											startActivity(intent);
+											AddItemActivity.this.finish();
+
 										}//end else of inserting into db
 									} //insert into DB bracket
 

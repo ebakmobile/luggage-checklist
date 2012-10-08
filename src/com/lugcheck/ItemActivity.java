@@ -377,7 +377,7 @@ public class ItemActivity extends Activity {
 					intent.putExtra("suitcase_id", suitcaseId);
 					Log.w("sending over suitcase id: ", " " + suitcaseId);
 					startActivity(intent);
-
+					ItemActivity.this.finish();
 				}
 			});
 
