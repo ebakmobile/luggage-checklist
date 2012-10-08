@@ -58,6 +58,30 @@ public class ItemActivity extends Activity {
 
 	}// end onCreate
 
+	protected void onStart() {//when you come back to this activity class
+		super.onStart(); // Always call the superclass method first
+		/* code below is to set the activity title to the trip_name */
+		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
+		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
+		c.moveToFirst();
+		String suitcaseName = c.getString(c.getColumnIndex("suitcase_name"));
+		setTitle("Displaying items for " + suitcaseName);
+
+		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+
+		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+		tripContainer.removeAllViews();
+		tripContainer.addView(addTrip);
+
+		View ruler = new View(this);
+		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+				ViewGroup.LayoutParams.MATCH_PARENT, 2));
+		createLayoutsFromDB();
+		c.close();
+
+	}
+
 	public void createLayoutsFromDB() {
 		/* Code Below fetches trips from item_table and creates a layout */
 		Cursor c = db.rawQuery("SELECT * from Item where suitcase_id = '" + suitcaseId + "'", null);
