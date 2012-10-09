@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
 	SQLiteDatabase db;
 	public static int TRIP_ID = 0;
 	private DAO dao;
+	private float density;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,8 @@ public class MainActivity extends Activity {
 		 * For now, the following line of code is the temporary fix.
 		 */
 		db = ((DAOImpl) dao).temporaryFixForDb();
+
+		density = this.getResources().getDisplayMetrics().density;
 
 		/* code below just adds a black horizontal line*/
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
@@ -113,14 +116,13 @@ public class MainActivity extends Activity {
 			ImageView im = new ImageView(this);
 			im.setImageResource(R.drawable.plane);
 			// FROM STACKOVERFLOW!
-			float d = this.getResources().getDisplayMetrics().density;
-			int width = (int) (58 * d);
-			int height = (int) (50 * d);
+			int width = (int) (58 * density);
+			int height = (int) (50 * density);
 			im.setLayoutParams(new LayoutParams(width, height));
-			int pad = (int) (5 * d);
+			int pad = (int) (5 * density);
 			im.setPadding(pad, pad, 0, 0);
 			// END
-			int txtPadding = (int) (20 * d);
+			int txtPadding = (int) (20 * density);
 			hw.setPadding(0, txtPadding, 0, 0);
 
 			LinearLayout newTab = new LinearLayout(this);
@@ -171,10 +173,9 @@ public class MainActivity extends Activity {
 
 				}
 			});
-		}//end while*/
+		}
 		c.close();
-
-	}//end method
+	}
 
 	public void deleteFromDB(String i) {
 
@@ -199,8 +200,9 @@ public class MainActivity extends Activity {
 			LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 			final LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.VERTICAL);
-			final EditText hw = new EditText(this);
-			hw.setHint("Enter trip name");
+			final EditText textBox = new EditText(this);
+			textBox.setHint("Enter trip name");
+			textBox.setHeight((int) (60 * density));
 			final Button okButton = new Button(this);
 			okButton.setText("Add");
 			final Button cancelButton = new Button(this);
@@ -208,7 +210,7 @@ public class MainActivity extends Activity {
 
 			LinearLayout ll = new LinearLayout(this);
 			ll.setOrientation(LinearLayout.VERTICAL);
-			ll.addView(hw);
+			ll.addView(textBox);
 
 			LinearLayout horizontalButtons = new LinearLayout(this);
 			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal

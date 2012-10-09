@@ -30,11 +30,13 @@ public class SuitcaseActivity extends Activity {
 	SQLiteDatabase db;
 	static int limit; //limit to only creating one trip at a time
 	public static int SUITCASE_ID = 0;
+	private float density;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_suitcase);
+		density = this.getResources().getDisplayMetrics().density;
 
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
@@ -78,14 +80,13 @@ public class SuitcaseActivity extends Activity {
 			ImageView im = new ImageView(this);
 			im.setImageResource(R.drawable.suitcase_icon);
 			// FROM STACKOVERFLOW!
-			float d = this.getResources().getDisplayMetrics().density;
-			int width = (int) (58 * d);
-			int height = (int) (50 * d);
+			int width = (int) (58 * density);
+			int height = (int) (50 * density);
 			im.setLayoutParams(new LayoutParams(width, height));
-			int pad = (int) (5 * d);
+			int pad = (int) (5 * density);
 			im.setPadding(pad, pad, 0, 0);
 			// END
-			int txtPadding = (int) (20 * d);
+			int txtPadding = (int) (20 * density);
 			hw.setPadding(0, txtPadding, 0, 0);
 
 			LinearLayout newTab = new LinearLayout(this);
@@ -133,15 +134,11 @@ public class SuitcaseActivity extends Activity {
 					Intent intent = new Intent(SuitcaseActivity.this, ItemActivity.class);
 					intent.putExtra("suitcase_id", suitcase_id2);
 					startActivity(intent);
-
 				}
 			});
-
-		}//end while*/
-
+		}
 		c.close();
-
-	}//end method
+	}
 
 	public void deleteFromDB(String i, int trip_id) {
 
@@ -158,26 +155,25 @@ public class SuitcaseActivity extends Activity {
 		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, 2));
 		createLayoutsFromDB();
-
 	}
 
 	public void addSuitcase(View view) {
-
 		if (limit == 0)//checking to make sure there is no open layouts 
 		{
 			limit = 1;
-			LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+			LayoutParams layoutParams = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 			final LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.VERTICAL);
-			final EditText hw = new EditText(this);
-			hw.setHint("Enter suitcase name");
+			final EditText textBox = new EditText(this);
+			textBox.setHint("Enter suitcase name");
+			textBox.setHeight((int) (60 * density));
 			final Button okButton = new Button(this);
 			okButton.setText("Add");
 			final Button cancelButton = new Button(this);
 			cancelButton.setText("Cancel");
 			LinearLayout ll = new LinearLayout(this);
 			ll.setOrientation(LinearLayout.VERTICAL);
-			ll.addView(hw);
+			ll.addView(textBox);
 
 			LinearLayout horizontalButtons = new LinearLayout(this);
 			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
@@ -194,7 +190,7 @@ public class SuitcaseActivity extends Activity {
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
-			tripContainer.addView(newTab, 0, lp);
+			tripContainer.addView(newTab, 0, layoutParams);
 
 			//Code below is for adding a trip to the database
 			okButton.setOnClickListener(new View.OnClickListener() {
@@ -267,8 +263,7 @@ public class SuitcaseActivity extends Activity {
 
 							dupe.show();
 
-						}//end else
-
+						}
 					}
 				}
 			});
@@ -288,9 +283,6 @@ public class SuitcaseActivity extends Activity {
 
 				}
 			});
-
 		}
-
 	}
-
-} //end activity
+}

@@ -24,14 +24,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class AddItemActivity extends Activity {
-	int limit;
-	int suitcaseId;
-	SQLiteDatabase db;
-	ArrayList<String> insertList; //inserts this list into QuickAdd table
+	private int suitcaseId;
+	private SQLiteDatabase db;
+	private ArrayList<String> insertList; //inserts this list into QuickAdd table
+	private float density;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		density = this.getResources().getDisplayMetrics().density;
 		setContentView(R.layout.activity_add_item);
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
@@ -40,7 +41,6 @@ public class AddItemActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id");
 		Log.w("Suitcase id is ", " " + suitcaseId);
-		limit = 0;
 		setTitle("Quick Add");
 		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
 		if (c.getCount() <= 0) {// if there is nothing in the QuickAdd Table
@@ -74,14 +74,13 @@ public class AddItemActivity extends Activity {
 			ImageView im = new ImageView(this);
 			im.setImageResource(R.drawable.opensuitcase);
 			// FROM STACKOVERFLOW!
-			float d = this.getResources().getDisplayMetrics().density;
-			int width = (int) (58 * d);
-			int height = (int) (50 * d);
+			int width = (int) (58 * density);
+			int height = (int) (50 * density);
 			im.setLayoutParams(new LayoutParams(width, height));
-			int pad = (int) (5 * d);
+			int pad = (int) (5 * density);
 			im.setPadding(pad, pad, 0, 0);
 			// END
-			int txtPadding = (int) (20 * d);
+			int txtPadding = (int) (20 * density);
 			hw.setPadding(0, txtPadding, 0, 0);
 
 			Button addButton = new Button(this);
@@ -145,7 +144,7 @@ public class AddItemActivity extends Activity {
 
 										dupe.show();
 
-									}// end if(!quantity.matches(//d+)
+									}
 
 									else {
 										if (isDupe == true) {//if there is a duplicate
@@ -159,46 +158,36 @@ public class AddItemActivity extends Activity {
 																int which) {
 														}
 													});
-
 											dupe.show();
 
-										}
-
-										else {
-											String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
-
-													+ text
-													+ "', '"
-													+ quantity
-													+ "','"
-													+ suitcaseId
-													+ "','0')";
+										} else {
+											String INSERT_STATEMENT = new StringBuilder(
+													"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('")
+													.append(text).append("', '").append(quantity)
+													.append("',')").append(suitcaseId)
+													.append("','0')").toString();
 											db.execSQL(INSERT_STATEMENT);
 											Intent intent = new Intent(AddItemActivity.this,
 													ItemActivity.class);
 											intent.putExtra("suitcase_id", suitcaseId);
 											startActivity(intent);
 											AddItemActivity.this.finish();
-
-										}//end else of inserting into db
-									} //insert into DB bracket
-
-								}//end and moves onto the setNegative
+										}
+									}
+								}
 							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
 									dialog.cancel();
-								}//end setNegativeButton Onclick
-							});//end setNegativeButton
+								}
+							});
 
 					AlertDialog alert = builder.create();
 					alert.show();
 
-				}//end addButton on(ClickViewV)
-			}); //end addButton.setOnClickListener
-
-		}//end while
-
-	}//end method 
+				}
+			});
+		}
+	}
 
 	public void addIntoArrayList() {
 		insertList.add("Shoes");

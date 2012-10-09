@@ -25,13 +25,15 @@ import android.widget.TextView;
 
 public class ItemActivity extends Activity {
 
-	SQLiteDatabase db;
-	int suitcaseId;
-	int limit;
+	private SQLiteDatabase db;
+	private int suitcaseId;
+	private int limit;
+	private float density;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		density = this.getResources().getDisplayMetrics().density;
 		setContentView(R.layout.activity_item);
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
@@ -105,21 +107,19 @@ public class ItemActivity extends Activity {
 				ImageView checkmarkImage = new ImageView(ItemActivity.this);
 				checkmarkImage.setImageResource(R.drawable.checkmark); // creating a checkmark
 				// FROM STACKOVERFLOW!
-				float d = ItemActivity.this.getResources().getDisplayMetrics().density;
-				int width = (int) (58 * d);
-				int height = (int) (50 * d);
+				int width = (int) (58 * density);
+				int height = (int) (50 * density);
 				checkmarkImage.setLayoutParams(new LayoutParams(width, height));
-				int pad = (int) (5 * d);
+				int pad = (int) (5 * density);
 				checkmarkImage.setPadding(pad, pad, 0, 0);
 
 				ImageView im = new ImageView(this);
 				im.setImageResource(R.drawable.opensuitcase);
 				// FROM STACKOVERFLOW!
-
 				im.setLayoutParams(new LayoutParams(width, height));
 				im.setPadding(pad, pad, 0, 0);
 				// END
-				int txtPadding = (int) (20 * d);
+				int txtPadding = (int) (20 * density);
 				hw.setPadding(0, txtPadding, 0, 0);
 
 				LinearLayout newTab = new LinearLayout(this);
@@ -211,14 +211,13 @@ public class ItemActivity extends Activity {
 				ImageView im = new ImageView(this);
 				im.setImageResource(R.drawable.opensuitcase);
 				// FROM STACKOVERFLOW!
-				float d = this.getResources().getDisplayMetrics().density;
-				int width = (int) (58 * d);
-				int height = (int) (50 * d);
+				int width = (int) (58 * density);
+				int height = (int) (50 * density);
 				im.setLayoutParams(new LayoutParams(width, height));
-				int pad = (int) (5 * d);
+				int pad = (int) (5 * density);
 				im.setPadding(pad, pad, 0, 0);
 				// END
-				int txtPadding = (int) (20 * d);
+				int txtPadding = (int) (20 * density);
 				hw.setPadding(0, txtPadding, 0, 0);
 
 				LinearLayout newTab = new LinearLayout(this);
@@ -272,11 +271,10 @@ public class ItemActivity extends Activity {
 						ImageView im = new ImageView(ItemActivity.this);
 						im.setImageResource(R.drawable.checkmark); // creating a checkmark
 						// FROM STACKOVERFLOW!
-						float d = ItemActivity.this.getResources().getDisplayMetrics().density;
-						int width = (int) (58 * d);
-						int height = (int) (50 * d);
+						int width = (int) (58 * density);
+						int height = (int) (50 * density);
 						im.setLayoutParams(new LayoutParams(width, height));
-						int pad = (int) (5 * d);
+						int pad = (int) (5 * density);
 						im.setPadding(pad, pad, 0, 0);
 
 						if ((textBox.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) // removes slash
@@ -339,10 +337,12 @@ public class ItemActivity extends Activity {
 			LayoutParams lp = new LayoutParams(-1, -2);
 			final LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.VERTICAL);
-			final EditText hw = new EditText(this);
-			hw.setHint("Enter item name");
+			final EditText itemNameText = new EditText(this);
+			itemNameText.setHint("Enter item name");
+			itemNameText.setHeight((int) (50 * density));
 			final EditText quantity = new EditText(this);
 			quantity.setHint("Enter Quantity");
+			quantity.setHeight((int) (50 * density));
 			final Button okButton = new Button(this);
 			okButton.setText("Add");
 			Button cancelButton = new Button(this);
@@ -357,7 +357,7 @@ public class ItemActivity extends Activity {
 			horizontalButtons.addView(okButton, param);
 			horizontalButtons.addView(cancelButton, param);
 			ll.setOrientation(LinearLayout.VERTICAL);
-			ll.addView(hw);
+			ll.addView(itemNameText);
 			ll.addView(quantity);
 			ll.addView(horizontalButtons);
 			ll.addView(quickAddButton);
@@ -489,7 +489,7 @@ public class ItemActivity extends Activity {
 
 							dupe.show();
 
-						}// end else
+						}
 					}
 				}
 			});
@@ -513,7 +513,7 @@ public class ItemActivity extends Activity {
 
 		}
 
-	}// end method
+	}
 
 	/* method below determines if a string is a integer. Used for Quanity */
 	public boolean isInteger(String s) {
@@ -526,4 +526,4 @@ public class ItemActivity extends Activity {
 		}
 		return result;
 	}
-} // end activity
+}
