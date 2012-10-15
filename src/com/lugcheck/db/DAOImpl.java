@@ -1,3 +1,20 @@
+/*	
+	NOTICE for Luggage & Suitcase Checklist, an Android app:
+    Copyright (C) 2012 EBAK Mobile
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    */
 package com.lugcheck.db;
 
 import android.content.Context;
@@ -27,7 +44,8 @@ public class DAOImpl implements DAO {
 			tempVersion = Integer.parseInt(dbVersion);
 		} catch (NumberFormatException e) {
 			tempVersion = -1; // This default value will signify an error;
-			Log.e("DB Error", "An illegal version number was used in the db properties file. " + "A non-numeric value was probably used.");
+			Log.e("DB Error", "An illegal version number was used in the db properties file. "
+					+ "A non-numeric value was probably used.");
 		}
 		DB_VERSION = tempVersion;
 	}
@@ -54,7 +72,8 @@ public class DAOImpl implements DAO {
 
 	private void insertItem(Item item) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		SQLiteStatement statement = db.compileStatement("INSERT INTO Item(item_name, quantity, suitcase_id) VALUES(?, ?, ?)");
+		SQLiteStatement statement = db
+				.compileStatement("INSERT INTO Item(item_name, quantity, suitcase_id) VALUES(?, ?, ?)");
 		db.beginTransaction();
 		try {
 			int i = 1;
@@ -71,7 +90,8 @@ public class DAOImpl implements DAO {
 
 	private void insertSuitcase(Suitcase suitcase) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		SQLiteStatement statement = db.compileStatement("INSERT INTO Suitcase(suitcase_name, trip_id) VALUES(?, ?)");
+		SQLiteStatement statement = db
+				.compileStatement("INSERT INTO Suitcase(suitcase_name, trip_id) VALUES(?, ?)");
 		db.beginTransaction();
 		try {
 			int i = 1;
@@ -100,7 +120,8 @@ public class DAOImpl implements DAO {
 	}
 
 	/**
-	 * Temporary code to return a database reference to the rest of the application. Upon completion of refactoring, THIS METHOD SHOULD BE REMOVED!
+	 * Temporary code to return a database reference to the rest of the application. Upon completion
+	 * of refactoring, THIS METHOD SHOULD BE REMOVED!
 	 * 
 	 * @return Database reference
 	 */
