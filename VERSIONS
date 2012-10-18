@@ -1,0 +1,12 @@
+INFORMATION ABOUT VERSIONS
+
+NOTE: A Version name is x.y.z, where:
+- x is major release number
+- y is minor release number
+- z is bug fix number
+
+This list maps Version Codes to Version Names
+
+1: 1.0. Initial version of Luggage Checklist.
+2: 2.0. Now called Luggage & Suitcase Checklist. Quick Add functionality for items, larger area for text fields.
+3: 2.1. Applied GPLv3 to the app.
