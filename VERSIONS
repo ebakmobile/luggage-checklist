@@ -10,4 +10,4 @@ This list maps Version Codes to Version Names
 1: 1.0 Initial version of Luggage Checklist.
 2: 2.0 Now called Luggage & Suitcase Checklist. Quick Add functionality for items, larger area for text fields.
 3: 3.0 Andrew's temp fix of app.
-4: 3.1 Applied GPLv3 to the app.
+4: 3.1 Applied GPLv3 to the app; bug fix of duplicate ItemActivity after AddItemActivity finishes.
