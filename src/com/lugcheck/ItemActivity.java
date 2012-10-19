@@ -304,11 +304,7 @@ public class ItemActivity extends Activity {
 							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id ='"
 									+ item_id2 + "'";
 							db.execSQL(UPDATE_STATEMENT);
-
-						}
-
-						else // adds the slash
-						{
+						} else { // adds the slash
 							textBox.setPaintFlags(textBox.getPaintFlags()
 									| Paint.STRIKE_THRU_TEXT_FLAG);
 							ll.addView(im);
@@ -318,14 +314,12 @@ public class ItemActivity extends Activity {
 						}
 					}
 				});
-
-			}//end else 		
-		}// end while*/
+			}
+		}
 		c.close();
-	} // end method
+	}
 
 	public void deleteFromDB(String i, int suitcase_id) {
-
 		String deleteFromDB = "delete from Item where item_name = '" + i + "' and suitcase_id = '"
 				+ suitcase_id + "'";
 		db.execSQL(deleteFromDB);
@@ -343,10 +337,6 @@ public class ItemActivity extends Activity {
 	}
 
 	public void addItem(View view) {// go to add activity screen
-
-		/*Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
-		intent.putExtra("suitcase_id", suitcaseId);
-		startActivity(intent);*/
 
 		if (limit == 0)// checking to make sure there is no open layouts
 		{
@@ -395,8 +385,7 @@ public class ItemActivity extends Activity {
 					Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
 					intent.putExtra("suitcase_id", suitcaseId);
 					Log.w("sending over suitcase id: ", " " + suitcaseId);
-					startActivity(intent);
-					//ItemActivity.this.finish();
+					startActivityForResult(intent, 1);
 				}
 			});
 
@@ -421,9 +410,7 @@ public class ItemActivity extends Activity {
 
 						dupe.show();
 
-					}
-
-					else if (itemName.equals("")) // if they try to add a null
+					} else if (itemName.equals("")) // if they try to add a null
 													// trip to database
 					{
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
@@ -435,9 +422,7 @@ public class ItemActivity extends Activity {
 
 						dupe.show();
 
-					}
-
-					else if (quantity.equals("")) {
+					} else if (quantity.equals("")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("You cannot enter a blank quantity. Please enter a quantity");
 						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
@@ -447,9 +432,7 @@ public class ItemActivity extends Activity {
 
 						dupe.show();
 
-					}
-
-					else if (!quantity.matches("\\d+")) {
+					} else if (!quantity.matches("\\d+")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("Please enter a numeric value for 'Quantity'");
 						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
@@ -462,7 +445,6 @@ public class ItemActivity extends Activity {
 					}
 					// code below checks for duplicates in database
 					else {
-
 						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
 								+ suitcaseId + "'", null);
 						c.moveToFirst();
@@ -475,8 +457,7 @@ public class ItemActivity extends Activity {
 								isDupe = true;
 								break;
 							}
-						}// end while
-
+						}
 						c.close();
 
 						if (isDupe == false) {// it will successfully insert item into db table
@@ -532,6 +513,14 @@ public class ItemActivity extends Activity {
 
 		}
 
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Attempt to restart this activity once the child activity (QuickAdd) returns
+		Intent intent = getIntent();
+		finish();
+		startActivity(intent);
 	}
 
 	/* method below determines if a string is a integer. Used for Quanity */
