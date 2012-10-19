@@ -189,8 +189,6 @@ public class AddItemActivity extends Activity {
 											resultIntent.putExtra("suitcase_id", suitcaseId);
 											setResult(RESULT_OK, resultIntent);
 											finish();
-											/*startActivity(resultIntent);
-											AddItemActivity.this.finish();*/
 										}
 									}
 								}
