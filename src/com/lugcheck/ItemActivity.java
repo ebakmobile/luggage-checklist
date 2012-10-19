@@ -85,6 +85,7 @@ public class ItemActivity extends Activity {
 		c.moveToFirst();
 		String suitcaseName = c.getString(c.getColumnIndex("suitcase_name"));
 		setTitle("Displaying items for " + suitcaseName);
+		Log.w("Suitcase NAme is", suitcaseName);
 
 		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
 
@@ -390,11 +391,12 @@ public class ItemActivity extends Activity {
 
 			quickAddButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
+					limit = 0;
 					Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
 					intent.putExtra("suitcase_id", suitcaseId);
 					Log.w("sending over suitcase id: ", " " + suitcaseId);
 					startActivity(intent);
-					ItemActivity.this.finish();
+					//ItemActivity.this.finish();
 				}
 			});
 

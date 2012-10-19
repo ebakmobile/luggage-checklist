@@ -178,11 +178,15 @@ public class AddItemActivity extends Activity {
 											dupe.show();
 
 										} else {
-											String INSERT_STATEMENT = new StringBuilder(
-													"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('")
-													.append(text).append("', '").append(quantity)
-													.append("',')").append(suitcaseId)
-													.append("','0')").toString();
+											/* please leave this statement alone*/
+											String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
+
+													+ text
+													+ "', '"
+													+ quantity
+													+ "','"
+													+ suitcaseId
+													+ "','0')";
 											db.execSQL(INSERT_STATEMENT);
 											Intent intent = new Intent(AddItemActivity.this,
 													ItemActivity.class);
