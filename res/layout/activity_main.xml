@@ -1,4 +1,18 @@
 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+    android:id="@+id/banner_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+ <com.google.ads.AdView android:id="@+id/adView"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_alignParentBottom="true"
+                         ads:adUnitId="a1508d762ede868"
+                         ads:adSize="SMART_BANNER"
+                         ads:loadAdOnCreate="true"/>
+    
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 
     android:layout_width="fill_parent"
@@ -11,8 +25,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical" >
-
+    android:orientation="vertical" >  
+     
     <LinearLayout
         android:id="@+id/add_trip"
         android:layout_width="match_parent"
@@ -39,5 +53,5 @@
     </LinearLayout>
 
 </LinearLayout>
-
 </ScrollView>
+</RelativeLayout>

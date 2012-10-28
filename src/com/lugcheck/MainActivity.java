@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.inject.Injector;
@@ -44,13 +45,18 @@ import com.lugcheck.db.DAOImpl;
 import com.lugcheck.db.DBException;
 import com.lugcheck.guice.GuiceManager;
 
-public class MainActivity extends Activity {
+import com.google.ads.*;
 
+
+public class MainActivity extends Activity {
+	
+	private AdView adView;
 	static int limit; //limit to only creating one trip at a time
 	SQLiteDatabase db;
 	public static int TRIP_ID = 0;
 	private DAO dao;
 	private float density;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +65,9 @@ public class MainActivity extends Activity {
 		GuiceManager.getInitialInstance(this);
 		setContentView(R.layout.activity_main);
 		limit = 0;
-
+		String myAdmobPublisherID="a1508d762ede868";
+		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID); 
+			
 		try {
 			initDb();
 		} catch (DBException e) {
@@ -120,6 +128,7 @@ public class MainActivity extends Activity {
 
 	public void createLayoutsFromDB() {
 
+		
 		/* Code Below fetches trips from trip_table and creates a layout*/
 		Cursor c = db.rawQuery("SELECT * from Trip", null);
 		c.moveToFirst();
@@ -244,7 +253,9 @@ public class MainActivity extends Activity {
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-			tripContainer.addView(newTab, 0, lp);
+			adView.loadAd(new AdRequest());
+			tripContainer.addView(adView,0); //adds the advertisement in the top		
+			tripContainer.addView(newTab, 1, lp);
 
 			//Code below is for adding a trip to the database
 			okButton.setOnClickListener(new View.OnClickListener() {

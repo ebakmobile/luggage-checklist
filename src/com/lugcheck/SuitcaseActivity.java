@@ -41,6 +41,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.google.ads.*;
 
 public class SuitcaseActivity extends Activity {
 	int tripId;
@@ -48,13 +49,18 @@ public class SuitcaseActivity extends Activity {
 	static int limit; //limit to only creating one trip at a time
 	public static int SUITCASE_ID = 0;
 	private float density;
+	private AdView adView;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_suitcase);
 		density = this.getResources().getDisplayMetrics().density;
-
+		
+		String myAdmobPublisherID="a1508d762ede868";
+		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID); 
+		
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
@@ -207,7 +213,9 @@ public class SuitcaseActivity extends Activity {
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
-			tripContainer.addView(newTab, 0, layoutParams);
+			adView.loadAd(new AdRequest());
+			tripContainer.addView(adView, 0);
+			tripContainer.addView(newTab, 1, layoutParams);
 
 			//Code below is for adding a trip to the database
 			okButton.setOnClickListener(new View.OnClickListener() {
