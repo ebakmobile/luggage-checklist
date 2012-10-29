@@ -19,6 +19,7 @@ package com.lugcheck;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import com.google.ads.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,6 +46,7 @@ public class AddItemActivity extends Activity {
 	private SQLiteDatabase db;
 	private ArrayList<String> insertList; //inserts this list into QuickAdd table
 	private float density;
+	private AdView adView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,12 @@ public class AddItemActivity extends Activity {
 			}
 
 		}
+		String myAdmobPublisherID="a1508d762ede868";
+		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID);  
+		LinearLayout layout = (LinearLayout)findViewById(R.id.add_item_container);
+		adView.loadAd(new AdRequest());
+		layout.addView(adView,0);
+
 		createLayoutsFromDB();
 		c.close();
 

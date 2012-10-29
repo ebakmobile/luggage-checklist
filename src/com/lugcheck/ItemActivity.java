@@ -18,6 +18,7 @@
 package com.lugcheck;
 
 import java.util.Locale;
+import com.google.ads.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -46,6 +47,7 @@ public class ItemActivity extends Activity {
 	private int suitcaseId;
 	private int limit;
 	private float density;
+	private AdView adView;
 
 	private OnLongClickListener createDeleteListener(final String deleteId) {
 		return new OnLongClickListener() {
@@ -77,6 +79,9 @@ public class ItemActivity extends Activity {
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
 		limit = 0;
+		
+		String myAdmobPublisherID="a1508d762ede868";
+		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID);  
 
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id"); // receiving suitcase_id from previous activity
@@ -377,7 +382,9 @@ public class ItemActivity extends Activity {
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
-			tripContainer.addView(newTab, 0, lp);
+			adView.loadAd(new AdRequest());
+			tripContainer.addView(adView,0);
+			tripContainer.addView(newTab, 1, lp);
 
 			quickAddButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
