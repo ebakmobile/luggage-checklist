@@ -47,6 +47,27 @@ public class ItemActivity extends Activity {
 	private int limit;
 	private float density;
 
+	private OnLongClickListener createDeleteListener(final String deleteId) {
+		return new OnLongClickListener() {
+			public boolean onLongClick(View v) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+				builder.setMessage("Are you sure you want delete?").setCancelable(false)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								deleteFromDB(deleteId, suitcaseId);
+							}
+						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+				AlertDialog alert = builder.create();
+				alert.show();
+				return true;
+			}
+		};
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -110,10 +131,10 @@ public class ItemActivity extends Activity {
 
 			int isSlashed = c.getInt(c.getColumnIndex("is_slashed"));
 			TextView hw = new TextView(this);
-			String text = c.getString(c.getColumnIndex("item_name"));
+			String itemName = c.getString(c.getColumnIndex("item_name"));
 			int ITEM_ID = c.getInt(c.getColumnIndex("item_id"));
 			String quant = c.getString(c.getColumnIndex("quantity"));
-			hw.setText(" x " + text);
+			hw.setText(" x " + itemName);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			TextView qtext = new TextView(this);
 			qtext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
@@ -157,30 +178,9 @@ public class ItemActivity extends Activity {
 				c.moveToNext();
 
 				/* Code Below handles the delete situation */
-				final String text2 = text;
-				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
-					public boolean onLongClick(View v) {
-
-						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-						builder.setMessage("Are you sure you want delete?").setCancelable(false)
-								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										deleteFromDB(text2, suitcaseId);
-									}
-								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.cancel();
-									}
-								});
-
-						AlertDialog alert = builder.create();
-						alert.show();
-						return true;
-					}
-				});
+				newTab.setOnLongClickListener(createDeleteListener(itemName));
 
 				/* Code below handles the situation where u click a item */
-
 				final int item_id2 = ITEM_ID;
 
 				newTab.setOnClickListener(new Button.OnClickListener() {
@@ -254,7 +254,7 @@ public class ItemActivity extends Activity {
 				c.moveToNext();
 
 				/* Code Below handles the delete situation */
-				final String text2 = text;
+				final String text2 = itemName;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
