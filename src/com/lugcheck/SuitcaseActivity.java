@@ -182,7 +182,8 @@ public class SuitcaseActivity extends Activity {
 
 	public void addSuitcase(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
-		{
+		{	AdView bottomAd=(AdView)findViewById(R.id.adView);
+			bottomAd.setVisibility(View.INVISIBLE);
 			limit = 1;
 			LayoutParams layoutParams = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 			final LinearLayout newTab = new LinearLayout(this);
@@ -273,6 +274,8 @@ public class SuitcaseActivity extends Activity {
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 									ViewGroup.LayoutParams.MATCH_PARENT, 2));
 							createLayoutsFromDB();
+							AdView bottomAd=(AdView)findViewById(R.id.adView);
+							bottomAd.setVisibility(View.VISIBLE);
 						}
 
 						else {
@@ -305,6 +308,8 @@ public class SuitcaseActivity extends Activity {
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
 					createLayoutsFromDB();
+					AdView bottomAd=(AdView)findViewById(R.id.adView);
+					bottomAd.setVisibility(View.VISIBLE);
 
 				}
 			});
