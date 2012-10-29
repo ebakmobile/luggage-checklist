@@ -47,7 +47,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:paddingTop="20dp"
-            android:text="Add New Suitcase"
+            android:text="Add New Item"
             android:textSize="16sp"/>
     </LinearLayout>
 
