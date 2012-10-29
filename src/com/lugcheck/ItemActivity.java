@@ -346,7 +346,8 @@ public class ItemActivity extends Activity {
 		if (limit == 0)// checking to make sure there is no open layouts
 		{
 			limit = 1;
-
+			AdView bottomAd=(AdView)findViewById(R.id.adView);
+			bottomAd.setVisibility(View.INVISIBLE);
 			LayoutParams lp = new LayoutParams(-1, -2);
 			final LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.VERTICAL);
@@ -482,6 +483,8 @@ public class ItemActivity extends Activity {
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 									ViewGroup.LayoutParams.MATCH_PARENT, 2));
 							createLayoutsFromDB();
+							AdView bottomAd=(AdView)findViewById(R.id.adView);
+							bottomAd.setVisibility(View.VISIBLE);
 						}
 
 						else {
@@ -514,6 +517,8 @@ public class ItemActivity extends Activity {
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
 					createLayoutsFromDB();
+					AdView bottomAd=(AdView)findViewById(R.id.adView);
+					bottomAd.setVisibility(View.VISIBLE);
 
 				}
 			});

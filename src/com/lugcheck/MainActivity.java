@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -221,7 +222,8 @@ public class MainActivity extends Activity {
 
 	public void addTrip(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
-		{
+		{	AdView bottomAd=(AdView)findViewById(R.id.adView);
+			bottomAd.setVisibility(View.INVISIBLE);
 			limit = 1;
 			LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
 			final LinearLayout newTab = new LinearLayout(this);
@@ -311,6 +313,8 @@ public class MainActivity extends Activity {
 							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 									ViewGroup.LayoutParams.MATCH_PARENT, 2));
 							createLayoutsFromDB();
+							AdView bottomAd=(AdView)findViewById(R.id.adView);
+							bottomAd.setVisibility(View.VISIBLE);
 						} else {
 
 							AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
@@ -339,6 +343,8 @@ public class MainActivity extends Activity {
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
 					createLayoutsFromDB();
+					AdView bottomAd=(AdView)findViewById(R.id.adView);
+					bottomAd.setVisibility(View.VISIBLE);
 				}
 			});
 		}
