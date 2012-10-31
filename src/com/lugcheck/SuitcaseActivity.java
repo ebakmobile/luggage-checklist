@@ -171,6 +171,7 @@ public class SuitcaseActivity extends Activity {
 	{
 		final EditText editText = new EditText(SuitcaseActivity.this);
 		editText.setHint("New Suitcase Name");
+		editText.setText(name);
 		AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
 		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
 				.setView(editText)

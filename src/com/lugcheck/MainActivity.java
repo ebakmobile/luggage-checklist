@@ -215,6 +215,7 @@ import com.google.ads.*;
 	{	
 		final EditText editText = new EditText(MainActivity.this);
 		editText.setHint("New Trip Name");
+		editText.setText(name);
 		AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
 				.setView(editText)

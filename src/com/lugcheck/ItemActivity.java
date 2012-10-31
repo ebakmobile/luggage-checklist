@@ -339,9 +339,11 @@ public class ItemActivity extends Activity {
 	{
 		final EditText editText = new EditText(ItemActivity.this);
 		editText.setHint("New Item Name");
+		editText.setText(name);
 		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
 		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
 				.setView(editText)
+				
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						String newName = editText.getText().toString();		
