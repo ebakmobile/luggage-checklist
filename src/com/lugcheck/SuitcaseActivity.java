@@ -68,9 +68,7 @@ public class SuitcaseActivity extends Activity {
 
 		Bundle extras = getIntent().getExtras();
 		tripId = extras.getInt("trip_id"); // receiving trip_id from previous activity 
-		String bah = "In Suitcase Class, Trip_id is " + tripId;
-		Log.w("SDFDS", bah);
-
+		
 		/*code below is to set the activity title to the trip_name*/
 		String GET_TRIP_NAME = "select * from Trip where trip_id = '" + tripId + "'";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
@@ -126,7 +124,7 @@ public class SuitcaseActivity extends Activity {
 					ViewGroup.LayoutParams.MATCH_PARENT, 2));
 			c.moveToNext();
 
-			/*Code Below handles the delete situation*/
+			/*Code Below handles the long click situation*/
 			final String text2 = text;
 			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 				public boolean onLongClick(View v) {
@@ -138,10 +136,13 @@ public class SuitcaseActivity extends Activity {
 					            switch(which){
 					            case 0://edit 
 					              editFromDB(text2);
+					              return;
 					            case 1://delete    
-					              deleteFromDB(text2);			    
+					              deleteFromDB(text2);
+					              return;
 					            case 2: //cancel
 					            	dialog.cancel();
+					            	return;
 					            }
 					        }
 					    });
@@ -166,9 +167,53 @@ public class SuitcaseActivity extends Activity {
 		c.close();
 	}
 
-	public void editFromDB(String name)
+	public void editFromDB(final String name)
 	{
-		
+		final EditText editText = new EditText(SuitcaseActivity.this);
+		editText.setHint("New Suitcase Name");
+		AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
+				.setView(editText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String newName = editText.getText().toString();		
+						String currTripName;
+						boolean isDupe=false;
+						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='"+tripId+"'", null);
+						c.moveToFirst();
+						while (c.isAfterLast() == false) {// code will check for duplicates
+							currTripName = c.getString(c.getColumnIndex("suitcase_name"));
+							c.moveToNext();
+							if (newName.equals(currTripName)) {
+								isDupeTrue();
+								isDupe=true;
+							}
+						}
+						c.close();
+						
+					if(isDupe==false){
+					String editDB = "UPDATE Suitcase SET suitcase_name='" + newName + "' WHERE suitcase_name='" + name + 
+							"' and trip_id = '"+tripId +"'";
+					db.execSQL(editDB);
+					
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(SuitcaseActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+						}		
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 		
 		
 	}
@@ -177,11 +222,11 @@ public class SuitcaseActivity extends Activity {
 			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-						String deleteFromDB = "delete from Trip where trip_name = '" + i + "'";
+						String deleteFromDB = "delete from Suitcase where suitcase_name = '" + i + "' and trip_id='"+ tripId +"'";
 						db.execSQL(deleteFromDB);
 						
-						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
+						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
 						tripContainer.removeAllViews();
 						tripContainer.addView(addTrip);
 						View ruler = new View(SuitcaseActivity.this);
@@ -198,6 +243,20 @@ public class SuitcaseActivity extends Activity {
 			AlertDialog alert = builder.create();
 			alert.show();
 			
+		}
+		
+		public void isDupeTrue(){
+			AlertDialog dupe = new AlertDialog.Builder(
+					SuitcaseActivity.this).create();
+			dupe.setTitle("Duplicate Found");
+			dupe.setMessage("Suitcase name already exists");
+			dupe.setButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int which) {
+						}
+					});
+			dupe.show();
 		}
 
 	public void addSuitcase(View view) {

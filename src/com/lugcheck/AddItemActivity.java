@@ -79,7 +79,6 @@ public class AddItemActivity extends Activity {
 		LinearLayout layout = (LinearLayout)findViewById(R.id.add_item_container);
 		adView.loadAd(new AdRequest());
 		layout.addView(adView,0);
-
 		createLayoutsFromDB();
 		c.close();
 
@@ -212,6 +211,7 @@ public class AddItemActivity extends Activity {
 				}
 			});
 		}
+		c.close();
 	}
 
 	public void addIntoArrayList() {

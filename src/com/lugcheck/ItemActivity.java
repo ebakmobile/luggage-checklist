@@ -48,7 +48,7 @@ public class ItemActivity extends Activity {
 	private int limit;
 	private float density;
 	private AdView adView;
-
+	final private CharSequence longClickOptions[]={"Edit Item","Delete Item", "Cancel"};
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -161,22 +161,28 @@ public class ItemActivity extends Activity {
 						ViewGroup.LayoutParams.MATCH_PARENT, 2));
 				c.moveToNext();
 
-				/* Code Below handles the delete situation */
+				/* Code Below handles the delete/edit situation */
 				final String text2 = text;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
-						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-						builder.setMessage("Are you sure you want delete?").setCancelable(false)
-								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										deleteFromDB(text2, suitcaseId);
-									}
-								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.cancel();
-									}
-								});
+						 AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						    builder.setTitle("Select your option");
+						           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+						               public void onClick(DialogInterface dialog, int which) {
+						            switch(which){
+						            case 0://edit 
+						              editFromDB(text2);
+						              return;
+						            case 1://delete    
+						              deleteFromDB(text2);
+						              return;
+						            case 2: //cancel
+						            	dialog.cancel();
+						            	return;
+						            }
+						        }
+						    });
 
 						AlertDialog alert = builder.create();
 						alert.show();
@@ -258,22 +264,28 @@ public class ItemActivity extends Activity {
 						ViewGroup.LayoutParams.MATCH_PARENT, 2));
 				c.moveToNext();
 
-				/* Code Below handles the delete situation */
+				/* Code Below handles the delete/edit situation */
 				final String text2 = text;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
-						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-						builder.setMessage("Are you sure you want delete?").setCancelable(false)
-								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										deleteFromDB(text2, suitcaseId);
-									}
-								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.cancel();
-									}
-								});
+						 AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						    builder.setTitle("Select your option");
+						           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+						               public void onClick(DialogInterface dialog, int which) {
+						            switch(which){
+						            case 0://edit 
+						              editFromDB(text2);
+						              return;
+						            case 1://delete    
+						              deleteFromDB(text2);
+						              return;
+						            case 2: //cancel
+						            	dialog.cancel();
+						            	return;
+						            }
+						        }
+						    });
 
 						AlertDialog alert = builder.create();
 						alert.show();
@@ -284,7 +296,6 @@ public class ItemActivity extends Activity {
 				/* Code below handles the situation where u click a item */
 
 				final int item_id2 = ITEM_ID;
-
 				newTab.setOnClickListener(new Button.OnClickListener() {
 					public void onClick(View view) {
 
@@ -324,23 +335,97 @@ public class ItemActivity extends Activity {
 		c.close();
 	}
 
-	public void deleteFromDB(String i, int suitcase_id) {
-		String deleteFromDB = "delete from Item where item_name = '" + i + "' and suitcase_id = '"
-				+ suitcase_id + "'";
-		db.execSQL(deleteFromDB);
-
-		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
-		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
-		tripContainer.removeAllViews();
-		tripContainer.addView(addTrip);
-		View ruler = new View(this);
-		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT, 2));
-		createLayoutsFromDB();
+	public void editFromDB(final String name)
+	{
+		final EditText editText = new EditText(ItemActivity.this);
+		editText.setHint("New Item Name");
+		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
+				.setView(editText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String newName = editText.getText().toString();		
+						String currItemName;
+						boolean isDupe=false;
+						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"+suitcaseId+"'", null);
+						c.moveToFirst();
+						while (c.isAfterLast() == false) {// code will check for duplicates
+							currItemName = c.getString(c.getColumnIndex("item_name"));
+							c.moveToNext();
+							if (newName.equals(currItemName)) {
+								isDupeTrue();
+								isDupe=true;
+							}
+						}
+						c.close();
+						
+					if(isDupe==false){
+					String editDB = "UPDATE Item SET item_name='" + newName + "' WHERE item_name='" + name + 
+							"' and suitcase_id = '"+suitcaseId +"'";
+					db.execSQL(editDB);
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(ItemActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+						}		
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
+	}
+	
+	public void deleteFromDB(final String i) {
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+		builder.setMessage("Are you sure you want to delete?").setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					String deleteFromDB = "delete from Item where item_name = '" + i + "' and suitcase_id='"+suitcaseId +"'";
+					db.execSQL(deleteFromDB);
+					
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(ItemActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 
 	}
-
+	public void isDupeTrue(){
+		AlertDialog dupe = new AlertDialog.Builder(
+				ItemActivity.this).create();
+		dupe.setTitle("Duplicate Found");
+		dupe.setMessage("Item name already exists");
+		dupe.setButton("Ok",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,
+							int which) {
+					}
+				});
+		dupe.show();
+	}
 	public void addItem(View view) {// go to add activity screen
 
 		if (limit == 0)// checking to make sure there is no open layouts

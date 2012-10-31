@@ -55,7 +55,6 @@ import com.google.ads.*;
 		private AdView adView;
 		static int limit; //limit to only creating one trip at a time
 		SQLiteDatabase db;
-		public static int TRIP_ID = 0;
 		private DAO dao;
 		private float density;
 		final private CharSequence longClickOptions[]={"Edit Trip","Delete Trip", "Cancel"};
@@ -168,7 +167,7 @@ import com.google.ads.*;
 	
 				c.moveToNext();
 	
-				/*Code Below handles the delete situation*/
+				/*Code Below handles the long click situation*/
 				final String text2 = text; // text2 is the name of the trip
 				newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 					public boolean onLongClick(View v) {
@@ -212,7 +211,7 @@ import com.google.ads.*;
 			c.close();
 		}
 	
-	public void editFromDB(String name)
+	public void editFromDB(final String name)
 	{	
 		final EditText editText = new EditText(MainActivity.this);
 		editText.setHint("New Trip Name");
@@ -222,19 +221,22 @@ import com.google.ads.*;
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						String newName = editText.getText().toString();		
-						
+						String currTripName;
+						boolean isDupe=false;
 						Cursor c = db.rawQuery("SELECT * from Trip", null);
 						c.moveToFirst();
 						while (c.isAfterLast() == false) {// code will check for duplicates
-							String itemName = c.getString(c.getColumnIndex("trip_name"));
+							currTripName = c.getString(c.getColumnIndex("trip_name"));
 							c.moveToNext();
-							if (newName.equals(itemName)) {
+							if (newName.equals(currTripName)) {
 								isDupeTrue();
+								isDupe=true;
 							}
 						}
 						c.close();
-
-					String editDB = "delete from Trip where trip_name = '" + i + "'";
+						
+					if(isDupe==false){
+					String editDB = "UPDATE Trip SET trip_name='" + newName + "' WHERE trip_name='" + name + "'";
 					db.execSQL(editDB);
 					
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
@@ -246,8 +248,7 @@ import com.google.ads.*;
 					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 							ViewGroup.LayoutParams.MATCH_PARENT, 2));
 					createLayoutsFromDB();
-						
-						
+						}		
 					}
 				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -299,6 +300,7 @@ import com.google.ads.*;
 					});
 			dupe.show();
 		}
+		
 		public void addTrip(View view) {
 			if (limit == 0)//checking to make sure there is no open layouts 
 			{	AdView bottomAd=(AdView)findViewById(R.id.adView);
