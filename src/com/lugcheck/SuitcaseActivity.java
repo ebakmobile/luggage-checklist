@@ -50,7 +50,7 @@ public class SuitcaseActivity extends Activity {
 	public static int SUITCASE_ID = 0;
 	private float density;
 	private AdView adView;
-
+	final private CharSequence longClickOptions[]={"Edit Suitcase","Delete Suitcase", "Cancel"};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -131,17 +131,20 @@ public class SuitcaseActivity extends Activity {
 			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 				public boolean onLongClick(View v) {
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
-					builder.setMessage("Are you sure you want delete?").setCancelable(false)
-							.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									deleteFromDB(text2, tripId);
-								}
-							}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.cancel();
-								}
-							});
+					 AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+					    builder.setTitle("Select your option");
+					           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+					               public void onClick(DialogInterface dialog, int which) {
+					            switch(which){
+					            case 0://edit 
+					              editFromDB(text2);
+					            case 1://delete    
+					              deleteFromDB(text2);			    
+					            case 2: //cancel
+					            	dialog.cancel();
+					            }
+					        }
+					    });
 
 					AlertDialog alert = builder.create();
 					alert.show();
@@ -163,22 +166,39 @@ public class SuitcaseActivity extends Activity {
 		c.close();
 	}
 
-	public void deleteFromDB(String i, int trip_id) {
-
-		String deleteFromDB = "delete from Suitcase where suitcase_name = '" + i
-				+ "' and trip_id = '" + trip_id + "'";
-		db.execSQL(deleteFromDB);
-
-		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
-		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
-		tripContainer.removeAllViews();
-		tripContainer.addView(addTrip);
-		View ruler = new View(this);
-		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT, 2));
-		createLayoutsFromDB();
+	public void editFromDB(String name)
+	{
+		
+		
+		
 	}
+		public void deleteFromDB(final String i) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						String deleteFromDB = "delete from Trip where trip_name = '" + i + "'";
+						db.execSQL(deleteFromDB);
+						
+						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+						tripContainer.removeAllViews();
+						tripContainer.addView(addTrip);
+						View ruler = new View(SuitcaseActivity.this);
+						ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+						tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+								ViewGroup.LayoutParams.MATCH_PARENT, 2));
+						createLayoutsFromDB();
+						}
+					}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+		}
 
 	public void addSuitcase(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
