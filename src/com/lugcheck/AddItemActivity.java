@@ -59,7 +59,6 @@ public class AddItemActivity extends Activity {
 		insertList = new ArrayList<String>();
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id");
-		Log.w("Suitcase id is ", " " + suitcaseId);
 		setTitle("Quick Add");
 		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
 		if (c.getCount() <= 0) {// if there is nothing in the QuickAdd Table
@@ -68,7 +67,6 @@ public class AddItemActivity extends Activity {
 
 			for (int i = 0; i < insertList.size(); i++) {
 				String tempName = insertList.get(i);
-				//Log.w("tempName is  ", tempName);
 				String INSERT_STATEMENT = "INSERT INTO QuickAdd (name) Values ('" + tempName + "')";
 				db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 			}

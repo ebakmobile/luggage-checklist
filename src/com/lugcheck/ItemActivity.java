@@ -163,6 +163,7 @@ public class ItemActivity extends Activity {
 
 				/* Code Below handles the delete/edit situation */
 				final String text2 = text;
+				final String quantityText=quant;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
@@ -172,7 +173,7 @@ public class ItemActivity extends Activity {
 						               public void onClick(DialogInterface dialog, int which) {
 						            switch(which){
 						            case 0://edit 
-						              editFromDB(text2);
+						              editFromDB(text2, quantityText);
 						              return;
 						            case 1://delete    
 						              deleteFromDB(text2);
@@ -266,6 +267,7 @@ public class ItemActivity extends Activity {
 
 				/* Code Below handles the delete/edit situation */
 				final String text2 = text;
+				final String quantityText=quant;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
@@ -275,7 +277,7 @@ public class ItemActivity extends Activity {
 						               public void onClick(DialogInterface dialog, int which) {
 						            switch(which){
 						            case 0://edit 
-						              editFromDB(text2);
+						              editFromDB(text2,quantityText);
 						              return;
 						            case 1://delete    
 						              deleteFromDB(text2);
@@ -335,35 +337,34 @@ public class ItemActivity extends Activity {
 		c.close();
 	}
 
-	public void editFromDB(final String name)
+	public void editFromDB(final String name, String quantityText)
 	{
 		final EditText editText = new EditText(ItemActivity.this);
 		editText.setHint("New Item Name");
 		editText.setText(name);
+		final EditText editQuantity=new EditText(ItemActivity.this);
+		editQuantity.setText(quantityText);
+		editQuantity.setHint("Enter New Quantity");
+		LinearLayout layoutForEditText=new LinearLayout(ItemActivity.this);
+		layoutForEditText.setOrientation(LinearLayout.VERTICAL);
+		layoutForEditText.addView(editText);
+		layoutForEditText.addView(editQuantity);
+		
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
-				.setView(editText)
-				
+		builder.setMessage("Please enter a new name and quantity").setCancelable(false)
+				.setView(layoutForEditText)
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						String newName = editText.getText().toString();		
 						String currItemName;
-						boolean isDupe=false;
-						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"+suitcaseId+"'", null);
-						c.moveToFirst();
-						while (c.isAfterLast() == false) {// code will check for duplicates
-							currItemName = c.getString(c.getColumnIndex("item_name"));
-							c.moveToNext();
-							if (newName.equals(currItemName)) {
-								isDupeTrue();
-								isDupe=true;
-							}
-						}
-						c.close();
+						String newQuantity= editQuantity.getText().toString();
 						
-					if(isDupe==false){
-					String editDB = "UPDATE Item SET item_name='" + newName + "' WHERE item_name='" + name + 
-							"' and suitcase_id = '"+suitcaseId +"'";
+					boolean canInsert=canInsert(newQuantity,newName);
+					
+					if(canInsert==true){
+					String editDB = "UPDATE Item SET item_name='" + newName + "', quantity='"+ newQuantity +"' WHERE item_name='" + 
+					name +"' and suitcase_id = '"+suitcaseId +"'";
 					db.execSQL(editDB);
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
 					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
@@ -415,7 +416,7 @@ public class ItemActivity extends Activity {
 		alert.show();
 
 	}
-	public void isDupeTrue(){
+	public void showDupeMessage(){
 		AlertDialog dupe = new AlertDialog.Builder(
 				ItemActivity.this).create();
 		dupe.setTitle("Duplicate Found");
@@ -479,7 +480,6 @@ public class ItemActivity extends Activity {
 					limit = 0;
 					Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
 					intent.putExtra("suitcase_id", suitcaseId);
-					Log.w("sending over suitcase id: ", " " + suitcaseId);
 					startActivityForResult(intent, 1);
 				}
 			});
@@ -633,4 +633,74 @@ public class ItemActivity extends Activity {
 		}
 		return result;
 	}
+	
+	public boolean canInsert(String quantity, String itemName){
+		
+		if (quantity.equals("") && itemName.equals("")) {
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("Please enter a valid name and quantity");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		} else if (itemName.equals("")) // if they try to add a null
+										// trip to database
+		{
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("You cannot enter a blank item name. Please enter a item name");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		} else if (quantity.equals("")) {
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("You cannot enter a blank quantity. Please enter a quantity");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		} else if (!quantity.matches("\\d+")) {
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("Please enter a numeric value for 'Quantity'");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		}
+		
+		else {
+			String currItemName;
+			Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"+suitcaseId+"'", null);
+			c.moveToFirst();
+			while (c.isAfterLast() == false) {// code will check for duplicates
+				currItemName = c.getString(c.getColumnIndex("item_name"));
+				c.moveToNext();
+				if (itemName.equals(currItemName)) {
+					showDupeMessage();				
+				return false;
+				}
+			}
+			c.close();
+		}
+		
+		return true;
+		
+	}
+	
 }
