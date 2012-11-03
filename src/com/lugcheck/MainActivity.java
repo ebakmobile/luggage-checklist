@@ -57,6 +57,7 @@ import com.google.ads.*;
 		SQLiteDatabase db;
 		private DAO dao;
 		private float density;
+		int intTripId;
 		final private CharSequence longClickOptions[]={"Edit Trip","Delete Trip", "Cancel"};
 	
 		@Override
@@ -169,6 +170,7 @@ import com.google.ads.*;
 	
 				/*Code Below handles the long click situation*/
 				final String text2 = text; // text2 is the name of the trip
+				final int trip_id2 = trip_id;
 				newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 					public boolean onLongClick(View v) {
 	
@@ -178,7 +180,7 @@ import com.google.ads.*;
 						               public void onClick(DialogInterface dialog, int which) {
 						            switch(which){
 						            case 0://edit 
-						            	editFromDB(text2); 
+						            	editFromDB(text2,trip_id2); 
 						              return;
 						            case 1://delete    
 						            	deleteFromDB(text2);
@@ -197,7 +199,6 @@ import com.google.ads.*;
 					}
 				});
 				/* Code below handles the situation where u click a trip */
-				final int trip_id2 = trip_id;
 				newTab.setOnClickListener(new Button.OnClickListener() {
 					public void onClick(View v) {
 	
@@ -211,7 +212,7 @@ import com.google.ads.*;
 			c.close();
 		}
 	
-	public void editFromDB(final String name)
+	public void editFromDB(final String name,final int trip_id)
 	{	
 		final EditText editText = new EditText(MainActivity.this);
 		editText.setHint("New Trip Name");
@@ -223,21 +224,10 @@ import com.google.ads.*;
 					public void onClick(DialogInterface dialog, int id) {
 						String newName = editText.getText().toString();		
 						String currTripName;
-						boolean isDupe=false;
-						Cursor c = db.rawQuery("SELECT * from Trip", null);
-						c.moveToFirst();
-						while (c.isAfterLast() == false) {// code will check for duplicates
-							currTripName = c.getString(c.getColumnIndex("trip_name"));
-							c.moveToNext();
-							if (newName.equals(currTripName)) {
-								isDupeTrue();
-								isDupe=true;
-							}
-						}
-						c.close();
-						
-					if(isDupe==false){
-					String editDB = "UPDATE Trip SET trip_name='" + newName + "' WHERE trip_name='" + name + "'";
+						boolean canInsert= canInsert(newName,name, trip_id);				
+						if(canInsert==true){
+					String editDB = "UPDATE Trip SET trip_name='" + newName + "' WHERE trip_id='" + trip_id + "' and " +
+							"trip_name='"+ name +"'";
 					db.execSQL(editDB);
 					
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
@@ -288,7 +278,8 @@ import com.google.ads.*;
 			
 		}
 	
-		public void isDupeTrue(){
+			
+		public void showDupeItem(){
 			AlertDialog dupe = new AlertDialog.Builder(
 					MainActivity.this).create();
 			dupe.setTitle("Duplicate Found");
@@ -301,6 +292,42 @@ import com.google.ads.*;
 					});
 			dupe.show();
 		}
+		
+		public boolean canInsert(String itemName, String oldName, int trip_id){
+			
+			 if (itemName.equals("")) // if they try to add a null
+											// trip to database
+			{
+				AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+				dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+
+			} 
+			
+			else {
+				String currItemName;
+				Cursor c = db.rawQuery("SELECT * from Trip", null);
+				c.moveToFirst();
+				while (c.isAfterLast() == false) {// code will check for duplicates
+					currItemName = c.getString(c.getColumnIndex("trip_name"));
+					c.moveToNext();
+					if (itemName.equals(currItemName)) {
+						showDupeItem();				
+					return false;
+					}
+				}
+				c.close();
+			}
+			
+			return true;
+			
+		}		
 		
 		public void addTrip(View view) {
 			if (limit == 0)//checking to make sure there is no open layouts 

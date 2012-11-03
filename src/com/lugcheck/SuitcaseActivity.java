@@ -172,31 +172,21 @@ public class SuitcaseActivity extends Activity {
 		final EditText editText = new EditText(SuitcaseActivity.this);
 		editText.setHint("New Suitcase Name");
 		editText.setText(name);
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
 		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
 				.setView(editText)
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						String newName = editText.getText().toString();		
-						String currTripName;
-						boolean isDupe=false;
-						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='"+tripId+"'", null);
-						c.moveToFirst();
-						while (c.isAfterLast() == false) {// code will check for duplicates
-							currTripName = c.getString(c.getColumnIndex("suitcase_name"));
-							c.moveToNext();
-							if (newName.equals(currTripName)) {
-								isDupeTrue();
-								isDupe=true;
-							}
-						}
-						c.close();
+					String newName = editText.getText().toString();		
+					String currTripName;
+					boolean canInsert= canInsert(newName);
 						
-					if(isDupe==false){
+						
+					if(canInsert==true){
 					String editDB = "UPDATE Suitcase SET suitcase_name='" + newName + "' WHERE suitcase_name='" + name + 
 							"' and trip_id = '"+tripId +"'";
 					db.execSQL(editDB);
-					
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
 					tripContainer.removeAllViews();
@@ -246,7 +236,7 @@ public class SuitcaseActivity extends Activity {
 			
 		}
 		
-		public void isDupeTrue(){
+		public void showDupeItem(){
 			AlertDialog dupe = new AlertDialog.Builder(
 					SuitcaseActivity.this).create();
 			dupe.setTitle("Duplicate Found");
@@ -259,6 +249,43 @@ public class SuitcaseActivity extends Activity {
 					});
 			dupe.show();
 		}
+		
+		public boolean canInsert(String itemName){
+			
+			 if (itemName.equals("")) // if they try to add a null
+											// trip to database
+			{
+				AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+				dupe.setMessage("You cannot enter a blank suitcase name. Please enter a suitcase name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+
+			} 
+			
+			else {
+				String currItemName;
+				Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='"+tripId+"'", null);
+				c.moveToFirst();
+				while (c.isAfterLast() == false) {// code will check for duplicates
+					currItemName = c.getString(c.getColumnIndex("suitcase_name"));
+					c.moveToNext();
+					if (itemName.equals(currItemName)) {
+						showDupeItem();				
+					return false;
+					}
+				}
+				c.close();
+			}
+			
+			return true;
+			
+		}
+		
 
 	public void addSuitcase(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
