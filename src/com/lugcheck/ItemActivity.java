@@ -462,12 +462,11 @@ public class ItemActivity extends Activity {
 			ll.addView(itemNameText);
 			ll.addView(quantity);
 			ll.addView(horizontalButtons);
-			ll.addView(quickAddButton);
+			ll.addView(quickAddButton);	
 			newTab.addView(ll);
-
-			View ruler = new View(this);
-			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-			newTab.addView(ruler,
+			View ruler2=new View(this);
+			ruler2.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			newTab.addView(ruler2,
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
