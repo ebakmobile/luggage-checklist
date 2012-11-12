@@ -85,6 +85,7 @@ public class ItemActivity extends Activity {
 	protected void onStart() {//when you come back to this activity class
 		super.onStart(); // Always call the superclass method first
 		/* code below is to set the activity title to the trip_name */
+		limit=0;
 		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();
