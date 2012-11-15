@@ -451,7 +451,7 @@ public class ItemActivity extends Activity {
 			Button cancelButton = new Button(this);
 			cancelButton.setText("Cancel");
 			Button quickAddButton = new Button(this);
-			quickAddButton.setText("Quick Add...");
+			quickAddButton.setText("Suggested Items...");
 			LinearLayout ll = new LinearLayout(this);
 			LinearLayout horizontalButtons = new LinearLayout(this);
 			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
