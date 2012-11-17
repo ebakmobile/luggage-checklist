@@ -18,28 +18,28 @@
 package com.lugcheck;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
-import com.google.ads.*;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 public class AddItemActivity extends Activity {
 	private int suitcaseId;
@@ -47,10 +47,13 @@ public class AddItemActivity extends Activity {
 	private ArrayList<String> insertList; //inserts this list into QuickAdd table
 	private float density;
 	private AdView adView;
+	
+	HashMap<String, String> wantedList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		wantedList=new HashMap<String, String>();
 		density = this.getResources().getDisplayMetrics().density;
 		setContentView(R.layout.activity_add_item);
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
@@ -59,7 +62,7 @@ public class AddItemActivity extends Activity {
 		insertList = new ArrayList<String>();
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id");
-		setTitle("Quick Add");
+		setTitle("Suggested Items");
 		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
 		if (c.getCount() <= 0) {// if there is nothing in the QuickAdd Table
 
@@ -93,30 +96,34 @@ public class AddItemActivity extends Activity {
 			final String text = c.getString(c.getColumnIndex("name"));
 			hw.setText(text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-			ImageView im = new ImageView(this);
-			im.setImageResource(R.drawable.opensuitcase);
-			// FROM STACKOVERFLOW!
+			final CheckBox checkBox=new CheckBox(this);
+			final EditText quantity=new EditText(this);
+			quantity.setHint("Enter Quantity");
+			quantity.setVisibility(View.INVISIBLE);
 			int width = (int) (58 * density);
 			int height = (int) (50 * density);
-			im.setLayoutParams(new LayoutParams(width, height));
-			int pad = (int) (5 * density);
-			im.setPadding(pad, pad, 0, 0);
-			// END
+			checkBox.setLayoutParams(new LayoutParams(width, height));//set dimensions of checkbox
+			
+			//LayoutParams lp = new LayoutParams(new ViewGroup.MarginLayoutParams(100,100));
+			
+			//quantity.setLayoutParams(lp);
+			
 			int txtPadding = (int) (20 * density);
 			hw.setPadding(0, txtPadding, 0, 0);
-
-			Button addButton = new Button(this);
-			addButton.setText("Add");
-			RelativeLayout relativeLayoutAdd = new RelativeLayout(this); // put the add button on this relative layout to push to the right
-			LinearLayout newTab = new LinearLayout(this);
-			newTab.setOrientation(LinearLayout.HORIZONTAL);
+			
+			
+			RelativeLayout relativeLayoutAdd = new RelativeLayout(this); // put the quantity edittext on this relative layout to push to the right
 			RelativeLayout.LayoutParams paramRight = new RelativeLayout.LayoutParams(
 					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			paramRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-			newTab.addView(im);
-			newTab.addView(hw);
-			relativeLayoutAdd.addView(addButton, paramRight);
-			newTab.addView(relativeLayoutAdd);//add the relative layout onto the newTab layout
+			//paramRight.addRule(RelativeLayout.ALIGN_BOTTOM, RelativeLayout.TRUE);
+			relativeLayoutAdd.addView(quantity, paramRight);
+			
+			LinearLayout newTab = new LinearLayout(this);
+			newTab.setOrientation(LinearLayout.HORIZONTAL);
+			newTab.addView(checkBox);
+			newTab.addView(hw);	
+			newTab.addView(relativeLayoutAdd);
 			newTab.setBackgroundColor(Color.WHITE);
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.add_item_container);
@@ -128,89 +135,129 @@ public class AddItemActivity extends Activity {
 					ViewGroup.LayoutParams.MATCH_PARENT, 2));
 			c.moveToNext();
 
-			addButton.setOnClickListener(new View.OnClickListener() {
+			checkBox.setOnClickListener(new View.OnClickListener()
+			{
+			public void onClick(View v2)
+			    {
+				checkboxFunctions(checkBox,quantity);
+			    }
+			});
+			
+			newTab.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					final EditText quantityEditText = new EditText(AddItemActivity.this);
-					quantityEditText.setHint("Quantity");
-
-					AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
-					builder.setMessage("Please enter a quantity for " + text).setCancelable(false)
-							.setView(quantityEditText)
-							.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {// when they click "add" after entering quantity
-									String quantity = quantityEditText.getText().toString();
-									boolean isDupe = false;//code below checks for dupes in database
-									Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
-											+ suitcaseId + "'", null);
-									c.moveToFirst();
-
-									while (c.isAfterLast() == false) {
-										String itemName = c.getString(c.getColumnIndex("item_name"));
-										c.moveToNext();
-										if (text.equals(itemName)) {
-											isDupe = true;
-											break;
-										}
-									}
-
-									c.close();
-
-									if (!quantity.matches("\\d+")) {
-										AlertDialog dupe = new AlertDialog.Builder(
-												AddItemActivity.this).create();
-										dupe.setMessage("Please enter a numeric value for 'Quantity'");
-										dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-											public void onClick(DialogInterface dialog, int which) {
-											}
-										});
-
-										dupe.show();
-
-									}
-
-									else {
-										if (isDupe == true) {//if there is a duplicate
-											AlertDialog dupe = new AlertDialog.Builder(
-													AddItemActivity.this).create();
-											dupe.setTitle("Duplicate Found");
-											dupe.setMessage("Item already exists. Please use that item instead");
-											dupe.setButton("Ok",
-													new DialogInterface.OnClickListener() {
-														public void onClick(DialogInterface dialog,
-																int which) {
-														}
-													});
-											dupe.show();
-
-										} else {
-											/* Andrew's super-duper important insert statement */
-											String INSERT_STATEMENT = new StringBuilder(
-													"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('")
-													.append(text).append("', '").append(quantity)
-													.append("','").append(suitcaseId)
-													.append("','0')").toString();
-											db.execSQL(INSERT_STATEMENT);
-											Intent resultIntent = new Intent();
-											resultIntent.putExtra("suitcase_id", suitcaseId);
-											setResult(RESULT_OK, resultIntent);
-											finish();
-										}
-									}
-								}
-							}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.cancel();
-								}
-							});
-
-					AlertDialog alert = builder.create();
-					alert.show();
-
+				checkboxFunctions(checkBox,quantity);
+				
 				}
 			});
 		}
 		c.close();
 	}
+	
+	public void checkboxFunctions(CheckBox checkBox, EditText quantity){
+		
+		if(checkBox.isChecked())
+		{
+			checkBox.setChecked(false);
+			quantity.setVisibility(View.INVISIBLE);
+	
+		}
+			
+			
+			
+			else {
+			checkBox.setChecked(true);
+			quantity.setVisibility(View.VISIBLE);
+			}
+			
+	}
+	
+	
+	public void addSuggestedItem(View view)
+	{
+		
+		/*final EditText quantityEditText = new EditText(AddItemActivity.this);
+		quantityEditText.setHint("Quantity");
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
+		builder.setMessage("Please enter a quantity for " + text).setCancelable(false)
+				.setView(quantityEditText)
+				.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {// when they click "add" after entering quantity
+						String quantity = quantityEditText.getText().toString();
+						boolean isDupe = false;//code below checks for dupes in database
+						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
+								+ suitcaseId + "'", null);
+						c.moveToFirst();
+
+						while (c.isAfterLast() == false) {
+							String itemName = c.getString(c.getColumnIndex("item_name"));
+							c.moveToNext();
+							if (text.equals(itemName)) {
+								isDupe = true;
+								break;
+							}
+						}
+
+						c.close();
+
+						if (!quantity.matches("\\d+")) {
+							AlertDialog dupe = new AlertDialog.Builder(
+									AddItemActivity.this).create();
+							dupe.setMessage("Please enter a numeric value for 'Quantity'");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+
+							dupe.show();
+
+						}
+
+						else {
+							if (isDupe == true) {//if there is a duplicate
+								AlertDialog dupe = new AlertDialog.Builder(
+										AddItemActivity.this).create();
+								dupe.setTitle("Duplicate Found");
+								dupe.setMessage("Item already exists. Please use that item instead");
+								dupe.setButton("Ok",
+										new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog,
+													int which) {
+											}
+										});
+								dupe.show();
+
+							} else {
+								
+								String INSERT_STATEMENT = new StringBuilder(
+										"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('")
+										.append(text).append("', '").append(quantity)
+										.append("','").append(suitcaseId)
+										.append("','0')").toString();
+								db.execSQL(INSERT_STATEMENT);
+								Intent resultIntent = new Intent();
+								resultIntent.putExtra("suitcase_id", suitcaseId);
+								setResult(RESULT_OK, resultIntent);
+								finish();
+							}
+						}
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		AlertDialog alert = builder.create();
+		alert.show();
+*/
+		
+	}
+	
+	
+	
+	
+	
 
 	public void addIntoArrayList() {
 		insertList.add("Shoes");
@@ -230,7 +277,7 @@ public class AddItemActivity extends Activity {
 		insertList.add("Cap");
 		insertList.add("Pants");
 		insertList.add("Boots");
-		insertList.add("Flip Flops / Sandals");
+		insertList.add("Sandals");
 		insertList.add("Slippers");
 		insertList.add("Belt");
 		insertList.add("Toilet Paper");
