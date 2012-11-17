@@ -225,7 +225,7 @@ public class ItemActivity extends Activity {
 						}
 
 						else // adds the slash
-						{
+						{  
 							textBox.setPaintFlags(textBox.getPaintFlags()
 									| Paint.STRIKE_THRU_TEXT_FLAG);
 							ll.addView(im);

@@ -19,13 +19,17 @@ package com.lugcheck;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -97,28 +101,17 @@ public class AddItemActivity extends Activity {
 			hw.setText(text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			final CheckBox checkBox=new CheckBox(this);
-			final EditText quantity=new EditText(this);
-			quantity.setHint("Enter Quantity");
-			quantity.setVisibility(View.INVISIBLE);
 			int width = (int) (58 * density);
 			int height = (int) (50 * density);
 			checkBox.setLayoutParams(new LayoutParams(width, height));//set dimensions of checkbox
-			
-			//LayoutParams lp = new LayoutParams(new ViewGroup.MarginLayoutParams(100,100));
-			
-			//quantity.setLayoutParams(lp);
-			
+				
 			int txtPadding = (int) (20 * density);
 			hw.setPadding(0, txtPadding, 0, 0);
-			
-			
 			RelativeLayout relativeLayoutAdd = new RelativeLayout(this); // put the quantity edittext on this relative layout to push to the right
 			RelativeLayout.LayoutParams paramRight = new RelativeLayout.LayoutParams(
 					LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			paramRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-			//paramRight.addRule(RelativeLayout.ALIGN_BOTTOM, RelativeLayout.TRUE);
-			relativeLayoutAdd.addView(quantity, paramRight);
-			
+		
 			LinearLayout newTab = new LinearLayout(this);
 			newTab.setOrientation(LinearLayout.HORIZONTAL);
 			newTab.addView(checkBox);
@@ -128,53 +121,69 @@ public class AddItemActivity extends Activity {
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.add_item_container);
 			tripContainer.addView(newTab);
-
 			View ruler = new View(this);
 			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
 			tripContainer.addView(ruler, new ViewGroup.LayoutParams(
 					ViewGroup.LayoutParams.MATCH_PARENT, 2));
 			c.moveToNext();
 
-			checkBox.setOnClickListener(new View.OnClickListener()
-			{
-			public void onClick(View v2)
-			    {
-				checkboxFunctions(checkBox,quantity);
-			    }
-			});
 			
 			newTab.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-				checkboxFunctions(checkBox,quantity);
-				
+					if(checkBox.isChecked())
+					checkBox.setChecked(false);
+					else 
+						checkBox.setChecked(true);
+						
+						
+					
 				}
 			});
 		}
 		c.close();
 	}
 	
-	public void checkboxFunctions(CheckBox checkBox, EditText quantity){
-		
-		if(checkBox.isChecked())
-		{
-			checkBox.setChecked(false);
-			quantity.setVisibility(View.INVISIBLE);
-	
-		}
-			
-			
-			
-			else {
-			checkBox.setChecked(true);
-			quantity.setVisibility(View.VISIBLE);
-			}
-			
-	}
-	
+
 	
 	public void addSuggestedItem(View view)
 	{
 		
+		
+		LinearLayout iterateMe = (LinearLayout)findViewById(R.id.add_item_container);
+		
+		for(int i=1; i<iterateMe.getChildCount(); i++)
+		{
+		
+		if(i %2==0) // aka if it is even, then its a linear layout
+		{
+			LinearLayout ll= (LinearLayout)iterateMe.getChildAt(i);
+			CheckBox checkBox= (CheckBox)ll.getChildAt(0);
+			if(checkBox.isChecked())
+			{
+				TextView itemName= (TextView) ll.getChildAt(1); 
+				String itemString= (String)itemName.getText();
+				Log.w("Following is checked: ", itemString);
+				wantedList.put(itemString, "tbd");
+								
+			}
+		}
+		
+		else continue;// its odd so continue
+		}
+	}
+		
+		
+	public void setQuantity()
+		{ 
+		
+		Iterator myVeryOwnIterator = wantedList.keySet().iterator();
+		while(myVeryOwnIterator.hasNext()) {
+		    String itemName=(String)myVeryOwnIterator.next();
+		  //  String quantity=(String)wantedList.get(key);
+		
+		}
+
+
 		/*final EditText quantityEditText = new EditText(AddItemActivity.this);
 		quantityEditText.setHint("Quantity");
 
@@ -250,13 +259,12 @@ public class AddItemActivity extends Activity {
 
 		AlertDialog alert = builder.create();
 		alert.show();
-*/
+
 		
 	}
-	
-	
-	
-	
+	*/
+
+		}
 	
 
 	public void addIntoArrayList() {
