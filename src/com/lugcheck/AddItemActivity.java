@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -51,13 +53,14 @@ public class AddItemActivity extends Activity {
 	private ArrayList<String> insertList; //inserts this list into QuickAdd table
 	private float density;
 	private AdView adView;
+
 	
-	HashMap<String, String> wantedList;
+	ArrayList<String> wantedList; // I realized the 2nd parameter of this hasshMap (Quantity) is not neede. Oh well 
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		wantedList=new HashMap<String, String>();
+		wantedList=new ArrayList<String>();
 		density = this.getResources().getDisplayMetrics().density;
 		setContentView(R.layout.activity_add_item);
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
@@ -74,7 +77,7 @@ public class AddItemActivity extends Activity {
 
 			for (int i = 0; i < insertList.size(); i++) {
 				String tempName = insertList.get(i);
-				String INSERT_STATEMENT = "INSERT INTO QuickAdd (name) Values ('" + tempName + "')";
+				String INSERT_STATEMENT = "INSERT INTO QuickAdd (name) Values (\"" + tempName + "\")";
 				db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 			}
 
@@ -89,6 +92,22 @@ public class AddItemActivity extends Activity {
 
 	}
 
+	public boolean isAlreadyInSuitcase(String itemString)
+	{
+		
+		Cursor c = db.rawQuery("SELECT * from Item where suitcase_id=\""
+				+ suitcaseId + "\"", null);
+		c.moveToFirst();
+		while (c.isAfterLast() == false) {
+			String itemName = c.getString(c.getColumnIndex("item_name"));
+			c.moveToNext();
+			if (itemString.equals(itemName)) {
+				return true;
+			}
+		}
+		c.close();
+		return false;
+	}
 	public void createLayoutsFromDB() {
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
@@ -98,6 +117,13 @@ public class AddItemActivity extends Activity {
 
 			TextView hw = new TextView(this);
 			final String text = c.getString(c.getColumnIndex("name"));
+			if(isAlreadyInSuitcase(text)==true) // dont show items that are already in suitcas
+			{
+			c.moveToNext();
+			}
+			 
+			else //its not in suitcase already so we can display it
+			{
 			hw.setText(text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			final CheckBox checkBox=new CheckBox(this);
@@ -133,12 +159,10 @@ public class AddItemActivity extends Activity {
 					if(checkBox.isChecked())
 					checkBox.setChecked(false);
 					else 
-						checkBox.setChecked(true);
-						
-						
-					
+						checkBox.setChecked(true);	
 				}
 			});
+			}
 		}
 		c.close();
 	}
@@ -148,7 +172,7 @@ public class AddItemActivity extends Activity {
 	public void addSuggestedItem(View view)
 	{
 		
-		
+		boolean checkedSomething=false;
 		LinearLayout iterateMe = (LinearLayout)findViewById(R.id.add_item_container);
 		
 		for(int i=1; i<iterateMe.getChildCount(); i++)
@@ -162,111 +186,62 @@ public class AddItemActivity extends Activity {
 			{
 				TextView itemName= (TextView) ll.getChildAt(1); 
 				String itemString= (String)itemName.getText();
-				Log.w("Following is checked: ", itemString);
-				wantedList.put(itemString, "tbd");
-								
+				wantedList.add(itemString);
+				checkedSomething=true;
+									
 			}
 		}
 		
 		else continue;// its odd so continue
 		}
+	if(checkedSomething==true)//they had something checked 
+	{
+	 performInsertStuff();
+		 wantedList.clear();
+	 
 	}
-		
-		
-	public void setQuantity()
-		{ 
-		
-		Iterator myVeryOwnIterator = wantedList.keySet().iterator();
-		while(myVeryOwnIterator.hasNext()) {
-		    String itemName=(String)myVeryOwnIterator.next();
-		  //  String quantity=(String)wantedList.get(key);
-		
-		}
-
-
-		/*final EditText quantityEditText = new EditText(AddItemActivity.this);
-		quantityEditText.setHint("Quantity");
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
-		builder.setMessage("Please enter a quantity for " + text).setCancelable(false)
-				.setView(quantityEditText)
-				.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {// when they click "add" after entering quantity
-						String quantity = quantityEditText.getText().toString();
-						boolean isDupe = false;//code below checks for dupes in database
-						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
-								+ suitcaseId + "'", null);
-						c.moveToFirst();
-
-						while (c.isAfterLast() == false) {
-							String itemName = c.getString(c.getColumnIndex("item_name"));
-							c.moveToNext();
-							if (text.equals(itemName)) {
-								isDupe = true;
-								break;
-							}
-						}
-
-						c.close();
-
-						if (!quantity.matches("\\d+")) {
-							AlertDialog dupe = new AlertDialog.Builder(
-									AddItemActivity.this).create();
-							dupe.setMessage("Please enter a numeric value for 'Quantity'");
-							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int which) {
-								}
-							});
-
-							dupe.show();
-
-						}
-
-						else {
-							if (isDupe == true) {//if there is a duplicate
-								AlertDialog dupe = new AlertDialog.Builder(
-										AddItemActivity.this).create();
-								dupe.setTitle("Duplicate Found");
-								dupe.setMessage("Item already exists. Please use that item instead");
-								dupe.setButton("Ok",
-										new DialogInterface.OnClickListener() {
-											public void onClick(DialogInterface dialog,
-													int which) {
-											}
-										});
-								dupe.show();
-
-							} else {
-								
-								String INSERT_STATEMENT = new StringBuilder(
-										"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('")
-										.append(text).append("', '").append(quantity)
-										.append("','").append(suitcaseId)
-										.append("','0')").toString();
-								db.execSQL(INSERT_STATEMENT);
-								Intent resultIntent = new Intent();
-								resultIntent.putExtra("suitcase_id", suitcaseId);
-								setResult(RESULT_OK, resultIntent);
-								finish();
-							}
-						}
-					}
-				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-
-		AlertDialog alert = builder.create();
-		alert.show();
-
-		
-	}
-	*/
-
-		}
 	
+	else // they didnt checmark any items
+	{
+		AlertDialog dupe = new AlertDialog.Builder(
+				AddItemActivity.this).create();
+		dupe.setMessage("Please select some items that you want to add");
+		dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
 
+		dupe.show();
+
+	}
+		
+		
+	}
+		
+		
+	public void performInsertStuff()
+	{
+		
+		for (int i=0; i < wantedList.size(); i++) {
+			String itemString = (String)wantedList.get(i);
+			 Log.w("a","Wanted List has the following item,: " + itemString );
+		
+									String INSERT_STATEMENT = new StringBuilder(
+								"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values (\"")
+								.append(itemString).append("\", \"").append("1")
+								.append("\",\"").append(suitcaseId)
+								.append("\",\"0\")").toString();
+						db.execSQL(INSERT_STATEMENT);
+						Intent resultIntent = new Intent();
+						resultIntent.putExtra("suitcase_id", suitcaseId);
+						setResult(RESULT_OK, resultIntent);
+						finish();
+						
+					
+				}
+			 
+		}	
+	
 	public void addIntoArrayList() {
 		insertList.add("Shoes");
 		insertList.add("Underwear");

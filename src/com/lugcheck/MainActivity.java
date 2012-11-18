@@ -224,10 +224,10 @@ public class MainActivity extends Activity {
 				String currTripName;
 				boolean canInsert= canInsert(newName,name, trip_id);				
 				if(canInsert==true){
-					String editDB = "UPDATE Trip SET trip_name='" + newName + "' WHERE trip_id='" + trip_id + "' and " +
-							"trip_name='"+ name +"'";
+					String editDB = "UPDATE Trip SET trip_name=\"" + newName + "\" WHERE trip_id=\"" + trip_id + "\" and " +
+							"trip_name=\""+ name +"\"";
 					db.execSQL(editDB);
-
+					limit=0;
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
 					tripContainer.removeAllViews();
@@ -253,9 +253,9 @@ public class MainActivity extends Activity {
 		builder.setMessage("Are you sure you want to delete?").setCancelable(false)
 		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				String deleteFromDB = "delete from Trip where trip_name = '" + i + "'";
+				String deleteFromDB = "delete from Trip where trip_name = \"" + i + "\"";
 				db.execSQL(deleteFromDB);
-
+				limit=0;
 				LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
 				LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
 				tripContainer.removeAllViews();
@@ -406,8 +406,8 @@ public class MainActivity extends Activity {
 					c.close();
 
 					if (isDupe == false) {
-						String INSERT_STATEMENT = "INSERT INTO Trip (trip_name) Values ('"
-								+ tripName + "')";
+						String INSERT_STATEMENT = "INSERT INTO Trip (trip_name) Values (\""
+								+ tripName + "\")";
 						db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 
 						limit = 0;

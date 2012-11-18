@@ -70,7 +70,7 @@ public class SuitcaseActivity extends Activity {
 		tripId = extras.getInt("trip_id"); // receiving trip_id from previous activity 
 		
 		/*code below is to set the activity title to the trip_name*/
-		String GET_TRIP_NAME = "select * from Trip where trip_id = '" + tripId + "'";
+		String GET_TRIP_NAME = "select * from Trip where trip_id = \"" + tripId + "\"";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();
 		String trip_name = c.getString(c.getColumnIndex("trip_name"));
@@ -89,7 +89,7 @@ public class SuitcaseActivity extends Activity {
 	public void createLayoutsFromDB() {
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
-		Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id = '" + tripId + "'", null);
+		Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id = \"" + tripId + "\"", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
@@ -184,9 +184,10 @@ public class SuitcaseActivity extends Activity {
 						
 						
 					if(canInsert==true){
-					String editDB = "UPDATE Suitcase SET suitcase_name='" + newName + "' WHERE suitcase_name='" + name + 
-							"' and trip_id = '"+tripId +"'";
+					String editDB = "UPDATE Suitcase SET suitcase_name=\"" + newName + "\" WHERE suitcase_name=\"" + name + 
+							"\" and trip_id = \""+tripId +"\"";
 					db.execSQL(editDB);
+					limit=0;
 					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
 					tripContainer.removeAllViews();
@@ -213,9 +214,9 @@ public class SuitcaseActivity extends Activity {
 			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-						String deleteFromDB = "delete from Suitcase where suitcase_name = '" + i + "' and trip_id='"+ tripId +"'";
+						String deleteFromDB = "delete from Suitcase where suitcase_name = \"" + i + "\" and trip_id=\""+ tripId +"\"";
 						db.execSQL(deleteFromDB);
-						
+						limit=0;
 						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
 						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
 						tripContainer.removeAllViews();
@@ -269,7 +270,7 @@ public class SuitcaseActivity extends Activity {
 			
 			else {
 				String currItemName;
-				Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='"+tripId+"'", null);
+				Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id=\""+tripId+"\"", null);
 				c.moveToFirst();
 				while (c.isAfterLast() == false) {// code will check for duplicates
 					currItemName = c.getString(c.getColumnIndex("suitcase_name"));
@@ -350,8 +351,8 @@ public class SuitcaseActivity extends Activity {
 					//code below checks for duplicates in database
 					else {
 
-						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='" + tripId
-								+ "'", null);
+						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id=\"" + tripId
+								+ "\"", null);
 						c.moveToFirst();
 
 						boolean isDupe = false;
@@ -367,8 +368,8 @@ public class SuitcaseActivity extends Activity {
 						c.close();
 
 						if (isDupe == false) {
-							String INSERT_STATEMENT = "INSERT INTO Suitcase (suitcase_name, trip_id) Values ('"
-									+ suitcaseName + "', '" + tripId + "')";
+							String INSERT_STATEMENT = "INSERT INTO Suitcase (suitcase_name, trip_id) Values (\""
+									+ suitcaseName + "\", \"" + tripId + "\")";
 							db.execSQL(INSERT_STATEMENT); // insert into suitcase_table db
 							limit = 0; // allow to recreate a new trip
 
