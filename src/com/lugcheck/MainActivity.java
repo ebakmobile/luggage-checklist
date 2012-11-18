@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnLongClickListener;
@@ -216,11 +217,12 @@ public class MainActivity extends Activity {
 		editText.setHint("New Trip Name");
 		editText.setText(name);
 		AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
+		builder.setMessage("Please enter a new name for '" + name+"'").setCancelable(false)
 		.setView(editText)
 		.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				String newName = editText.getText().toString();		
+				String newName = editText.getText().toString();	
+									
 				String currTripName;
 				boolean canInsert= canInsert(newName,name, trip_id);				
 				if(canInsert==true){
@@ -307,6 +309,19 @@ public class MainActivity extends Activity {
 			return false;
 
 		} 
+		else if(itemName.contains("\""))
+		{
+			AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+			dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for trip name");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+			
+		}
 
 		else {
 			String currItemName;
@@ -387,7 +402,17 @@ public class MainActivity extends Activity {
 					dupe.show();
 
 				}
+				else if(tripName.contains("\""))
+					{
+						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+						dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for trip name");
+						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+							}
+						});
 
+						dupe.show();
+					}
 				//code below checks for duplicates in database
 				else {
 					Cursor c = db.rawQuery("SELECT * from Trip", null);

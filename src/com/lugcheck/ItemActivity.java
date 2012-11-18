@@ -39,6 +39,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class ItemActivity extends Activity {
@@ -58,7 +59,7 @@ public class ItemActivity extends Activity {
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
 		limit = 0;
-		
+		//notifyEditFunction();
 		String myAdmobPublisherID="a1508d762ede868";
 		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID);  
 
@@ -85,6 +86,9 @@ public class ItemActivity extends Activity {
 	protected void onStart() {//when you come back to this activity class
 		super.onStart(); // Always call the superclass method first
 		/* code below is to set the activity title to the trip_name */
+
+  /*when you come back to the item screen*/
+		//notifyEditFunction();	
 		limit=0;
 		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = \"" + suitcaseId + "\"";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
@@ -107,6 +111,33 @@ public class ItemActivity extends Activity {
 
 	}
 
+	
+	public void notifyEditFunction(){
+		/* Code below pops up dialogue explaining the app*/
+		Cursor notify = db.rawQuery("SELECT * from ItemNotificationRead", null);
+
+		if (notify.getCount() <= 0) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+			builder.setMessage(
+					"After adding items to your suitcase, you can edit them by pressing and holding the item")
+					.setTitle("Tips:").setCancelable(false)
+					.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					})
+					.setNegativeButton("Do not show again", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							db.execSQL("INSERT INTO ItemNotificationRead (read) Values ('1');");
+							dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
+		notify.close();
+	
+	}
 	public void createLayoutsFromDB() {
 		/* Code Below fetches trips from item_table and creates a layout */
 		Cursor c = db.rawQuery("SELECT * from Item where suitcase_id = \"" + suitcaseId + "\"", null);
@@ -436,7 +467,7 @@ public class ItemActivity extends Activity {
 		
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-		builder.setMessage("Please enter a new quantity").setCancelable(false)
+		builder.setMessage("Please enter a new quantity for '"+ name+"'").setCancelable(false)
 				.setView(layoutForEditText)
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -600,7 +631,21 @@ public class ItemActivity extends Activity {
 
 						dupe.show();
 
-					} else if (quantity.equals("")) {
+					} 
+					
+					
+					else if(itemName.contains("\""))
+						{
+							AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+							dupe.setMessage("Invalid character detected for item name. Please enter alphabets or numbers for item name");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+
+							dupe.show();
+						}
+					else if (quantity.equals("")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("You cannot enter a blank quantity. Please enter a quantity");
 						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
@@ -733,6 +778,20 @@ public class ItemActivity extends Activity {
 			return false;
 
 		} 
+		
+		 if(itemName.contains("\""))
+			{
+				AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+				dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for item name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+			}
+		
 		else {
 			String currItemName;
 			Cursor c = db.rawQuery("SELECT * from Item where suitcase_id=\""+suitcaseId+"\"", null);
@@ -766,8 +825,9 @@ public boolean canInsertQuantity(String quantity){
 
 			dupe.show();
 			return false;
-
-		} else if (!quantity.matches("\\d+")) {
+       } 
+		
+		else if (!quantity.matches("\\d+")) {
 			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 			dupe.setMessage("Please enter a numeric value for 'Quantity'");
 			dupe.setButton("Ok", new DialogInterface.OnClickListener() {

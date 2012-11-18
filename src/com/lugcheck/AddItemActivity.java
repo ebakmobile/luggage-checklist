@@ -40,6 +40,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -221,26 +222,55 @@ public class AddItemActivity extends Activity {
 		
 	public void performInsertStuff()
 	{
+		/*ProgressBar pb=new ProgressBar(this);
+			AlertDialog dupe = new AlertDialog.Builder(AddItemActivity.this).create();
+							dupe.setTitle("Adding selected item(s) to your suitcase");
+							dupe.setView(pb);
+							dupe.setCancelable(false);
+							dupe.setMessage("Tip: Default quantity is set to 1. You can edit the quantity by pressing and holding the item");
+							dupe.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+							
+			dupe.show();	*/
+			
+	for (int i=0; i < wantedList.size(); i++) {
+			String itemString1 = (String)wantedList.get(i);
+			 Log.w("a","Wanted List has the following item,: " + itemString1 );
 		
-		for (int i=0; i < wantedList.size(); i++) {
-			String itemString = (String)wantedList.get(i);
-			 Log.w("a","Wanted List has the following item,: " + itemString );
-		
-									String INSERT_STATEMENT = new StringBuilder(
-								"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values (\"")
-								.append(itemString).append("\", \"").append("1")
-								.append("\",\"").append(suitcaseId)
-								.append("\",\"0\")").toString();
-						db.execSQL(INSERT_STATEMENT);
-						Intent resultIntent = new Intent();
-						resultIntent.putExtra("suitcase_id", suitcaseId);
-						setResult(RESULT_OK, resultIntent);
-						finish();
-						
-					
+							String INSERT_STATEMENT = new StringBuilder(
+										"INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values (\"")
+										.append(itemString1).append("\", \"").append("1")
+										.append("\",\"").append(suitcaseId)
+										.append("\",\"0\")").toString();
+								db.execSQL(INSERT_STATEMENT);
+								Intent resultIntent = new Intent();
+								resultIntent.putExtra("suitcase_id", suitcaseId);
+								setResult(RESULT_OK, resultIntent);
+								finish();
 				}
 			 
 		}	
+	
+	public boolean canInsertPrompt()
+	{	ProgressBar pb=new ProgressBar(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
+		builder.setMessage("Adding ").setCancelable(false).setView(pb)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+				
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+		return true;
+		
+	}
 	
 	public void addIntoArrayList() {
 		insertList.add("Shoes");

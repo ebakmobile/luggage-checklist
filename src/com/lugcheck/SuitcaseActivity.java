@@ -174,7 +174,7 @@ public class SuitcaseActivity extends Activity {
 		editText.setText(name);
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
-		builder.setMessage("Please enter a new name for " + name).setCancelable(false)
+		builder.setMessage("Please enter a new name for '" + name+"'").setCancelable(false)
 				.setView(editText)
 				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -266,8 +266,20 @@ public class SuitcaseActivity extends Activity {
 				dupe.show();
 				return false;
 
-			} 
-			
+			}  
+			 
+			 else if(itemName.contains("\""))
+			{
+				AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+				dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for suitcase name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+			}
 			else {
 				String currItemName;
 				Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id=\""+tripId+"\"", null);
@@ -347,7 +359,17 @@ public class SuitcaseActivity extends Activity {
 						dupe.show();
 
 					}
-
+					else if(suitcaseName.contains("\""))
+						{
+							AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+							dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for suitcase name");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+							dupe.show();
+						}
+					
 					//code below checks for duplicates in database
 					else {
 
