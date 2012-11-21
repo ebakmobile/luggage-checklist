@@ -67,18 +67,22 @@ public class AddItemActivity extends Activity {
 		db = openOrCreateDatabase("data.db", SQLiteDatabase.CREATE_IF_NECESSARY, null);
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
+		
+		String CREATE_TBL="CREATE TABLE IF NOT EXISTS QuickAdd2(name TEXT NOT NULL PRIMARY KEY, category TEXT);";
+        db.execSQL(CREATE_TBL);
+        
 		insertList = new ArrayList<String>();
 		Bundle extras = getIntent().getExtras();
 		suitcaseId = extras.getInt("suitcase_id");
 		setTitle("Suggested Items");
-		Cursor c = db.rawQuery("SELECT * from QuickAdd", null);
+		Cursor c = db.rawQuery("SELECT * from QuickAdd2", null);
 		if (c.getCount() <= 0) {// if there is nothing in the QuickAdd Table
 
 			addIntoArrayList(); // add all the items into InserList. Then we shove it into the DB
 
 			for (int i = 0; i < insertList.size(); i++) {
 				String tempName = insertList.get(i);
-				String INSERT_STATEMENT = "INSERT INTO QuickAdd (name) Values (\"" + tempName + "\")";
+				String INSERT_STATEMENT = "INSERT INTO QuickAdd2 (name) Values (\"" + tempName + "\")";
 				db.execSQL(INSERT_STATEMENT); // insert into trip_table db
 			}
 
@@ -112,7 +116,7 @@ public class AddItemActivity extends Activity {
 	public void createLayoutsFromDB() {
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
-		Cursor c = db.rawQuery("SELECT * from QuickAdd ORDER BY name", null);
+		Cursor c = db.rawQuery("SELECT * from QuickAdd2 ORDER BY name", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
