@@ -15,3 +15,4 @@ This list maps Version Codes to Version Names
 6: 3.3: Adding functionality to edit Trips/Items/Suitcases
 7: 3.4: Added ability to quick add multiple items, and fixed insert into database bug with ' and "
 8: 3.5: Fixed database issues
+9: 3.6: Just "fake" update
