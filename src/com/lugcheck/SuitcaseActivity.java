@@ -50,7 +50,7 @@ public class SuitcaseActivity extends Activity {
 	public static int SUITCASE_ID = 0;
 	private float density;
 	private AdView adView;
-
+	final private CharSequence longClickOptions[]={"Edit Suitcase","Delete Suitcase", "Cancel"};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,11 +68,9 @@ public class SuitcaseActivity extends Activity {
 
 		Bundle extras = getIntent().getExtras();
 		tripId = extras.getInt("trip_id"); // receiving trip_id from previous activity 
-		String bah = "In Suitcase Class, Trip_id is " + tripId;
-		Log.w("SDFDS", bah);
-
+		
 		/*code below is to set the activity title to the trip_name*/
-		String GET_TRIP_NAME = "select * from Trip where trip_id = '" + tripId + "'";
+		String GET_TRIP_NAME = "select * from Trip where trip_id = \"" + tripId + "\"";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();
 		String trip_name = c.getString(c.getColumnIndex("trip_name"));
@@ -91,7 +89,7 @@ public class SuitcaseActivity extends Activity {
 	public void createLayoutsFromDB() {
 
 		/* Code Below fetches trips from trip_table and creates a layout*/
-		Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id = '" + tripId + "'", null);
+		Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id = \"" + tripId + "\"", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
@@ -126,22 +124,28 @@ public class SuitcaseActivity extends Activity {
 					ViewGroup.LayoutParams.MATCH_PARENT, 2));
 			c.moveToNext();
 
-			/*Code Below handles the delete situation*/
+			/*Code Below handles the long click situation*/
 			final String text2 = text;
 			newTab.setOnLongClickListener(new OnLongClickListener() { //code to delete a list
 				public boolean onLongClick(View v) {
 
-					AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
-					builder.setMessage("Are you sure you want delete?").setCancelable(false)
-							.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									deleteFromDB(text2, tripId);
-								}
-							}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									dialog.cancel();
-								}
-							});
+					 AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+					    builder.setTitle("Select your option");
+					           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+					               public void onClick(DialogInterface dialog, int which) {
+					            switch(which){
+					            case 0://edit 
+					              editFromDB(text2);
+					              return;
+					            case 1://delete    
+					              deleteFromDB(text2);
+					              return;
+					            case 2: //cancel
+					            	dialog.cancel();
+					            	return;
+					            }
+					        }
+					    });
 
 					AlertDialog alert = builder.create();
 					alert.show();
@@ -163,22 +167,138 @@ public class SuitcaseActivity extends Activity {
 		c.close();
 	}
 
-	public void deleteFromDB(String i, int trip_id) {
-
-		String deleteFromDB = "delete from Suitcase where suitcase_name = '" + i
-				+ "' and trip_id = '" + trip_id + "'";
-		db.execSQL(deleteFromDB);
-
-		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
-		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
-		tripContainer.removeAllViews();
-		tripContainer.addView(addTrip);
-		View ruler = new View(this);
-		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT, 2));
-		createLayoutsFromDB();
+	public void editFromDB(final String name)
+	{
+		final EditText editText = new EditText(SuitcaseActivity.this);
+		editText.setHint("New Suitcase Name");
+		editText.setText(name);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+		builder.setMessage("Please enter a new name for '" + name+"'").setCancelable(false)
+				.setView(editText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					String newName = editText.getText().toString();		
+					String currTripName;
+					boolean canInsert= canInsert(newName);
+						
+						
+					if(canInsert==true){
+					String editDB = "UPDATE Suitcase SET suitcase_name=\"" + newName + "\" WHERE suitcase_name=\"" + name + 
+							"\" and trip_id = \""+tripId +"\"";
+					db.execSQL(editDB);
+					limit=0;
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(SuitcaseActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+						}		
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
 	}
+		public void deleteFromDB(final String i) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(SuitcaseActivity.this);
+			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						String deleteFromDB = "delete from Suitcase where suitcase_name = \"" + i + "\" and trip_id=\""+ tripId +"\"";
+						db.execSQL(deleteFromDB);
+						limit=0;
+						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.suitcase_container);
+						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_suitcase);
+						tripContainer.removeAllViews();
+						tripContainer.addView(addTrip);
+						View ruler = new View(SuitcaseActivity.this);
+						ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+						tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+								ViewGroup.LayoutParams.MATCH_PARENT, 2));
+						createLayoutsFromDB();
+						}
+					}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+		}
+		
+		public void showDupeItem(){
+			AlertDialog dupe = new AlertDialog.Builder(
+					SuitcaseActivity.this).create();
+			dupe.setTitle("Duplicate Found");
+			dupe.setMessage("Suitcase name already exists");
+			dupe.setButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int which) {
+						}
+					});
+			dupe.show();
+		}
+		
+		public boolean canInsert(String itemName){
+			
+			 if (itemName.equals("")) // if they try to add a null
+											// trip to database
+			{
+				AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+				dupe.setMessage("You cannot enter a blank suitcase name. Please enter a suitcase name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+
+			}  
+			 
+			 else if(itemName.contains("\""))
+			{
+				AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+				dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for suitcase name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+			}
+			else {
+				String currItemName;
+				Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id=\""+tripId+"\"", null);
+				c.moveToFirst();
+				while (c.isAfterLast() == false) {// code will check for duplicates
+					currItemName = c.getString(c.getColumnIndex("suitcase_name"));
+					c.moveToNext();
+					if (itemName.equals(currItemName)) {
+						showDupeItem();				
+					return false;
+					}
+				}
+				c.close();
+			}
+			
+			return true;
+			
+		}
+		
 
 	public void addSuitcase(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
@@ -239,12 +359,22 @@ public class SuitcaseActivity extends Activity {
 						dupe.show();
 
 					}
-
+					else if(suitcaseName.contains("\""))
+						{
+							AlertDialog dupe = new AlertDialog.Builder(SuitcaseActivity.this).create();
+							dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for suitcase name");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+							dupe.show();
+						}
+					
 					//code below checks for duplicates in database
 					else {
 
-						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id='" + tripId
-								+ "'", null);
+						Cursor c = db.rawQuery("SELECT * from Suitcase where trip_id=\"" + tripId
+								+ "\"", null);
 						c.moveToFirst();
 
 						boolean isDupe = false;
@@ -260,8 +390,8 @@ public class SuitcaseActivity extends Activity {
 						c.close();
 
 						if (isDupe == false) {
-							String INSERT_STATEMENT = "INSERT INTO Suitcase (suitcase_name, trip_id) Values ('"
-									+ suitcaseName + "', '" + tripId + "')";
+							String INSERT_STATEMENT = "INSERT INTO Suitcase (suitcase_name, trip_id) Values (\""
+									+ suitcaseName + "\", \"" + tripId + "\")";
 							db.execSQL(INSERT_STATEMENT); // insert into suitcase_table db
 							limit = 0; // allow to recreate a new trip
 

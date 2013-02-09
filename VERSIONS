@@ -12,3 +12,7 @@ This list maps Version Codes to Version Names
 3: 3.0 Andrew's temp fix of app.
 4: 3.1 Applied GPLv3 to the app; bug fix of duplicate ItemActivity after AddItemActivity finishes.
 5: 3.2 Applied Admob
+6: 3.3: Adding functionality to edit Trips/Items/Suitcases
+7: 3.4: Added ability to quick add multiple items, and fixed insert into database bug with ' and "
+8: 3.5: Fixed database issues
+9: 3.6: Just "fake" update

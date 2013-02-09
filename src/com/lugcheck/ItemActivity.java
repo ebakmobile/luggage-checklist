@@ -39,6 +39,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class ItemActivity extends Activity {
@@ -48,28 +49,7 @@ public class ItemActivity extends Activity {
 	private int limit;
 	private float density;
 	private AdView adView;
-
-	private OnLongClickListener createDeleteListener(final String deleteId) {
-		return new OnLongClickListener() {
-			public boolean onLongClick(View v) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-				builder.setMessage("Are you sure you want delete?").setCancelable(false)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								deleteFromDB(deleteId, suitcaseId);
-							}
-						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						});
-				AlertDialog alert = builder.create();
-				alert.show();
-				return true;
-			}
-		};
-	}
-
+	final private CharSequence longClickOptions[]={"Edit Item Name","Edit Quantity", "Delete Item", "Cancel"};
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,7 +59,7 @@ public class ItemActivity extends Activity {
 		db.setVersion(1);
 		db.setLocale(Locale.getDefault());
 		limit = 0;
-		
+		//notifyEditFunction();
 		String myAdmobPublisherID="a1508d762ede868";
 		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID);  
 
@@ -87,7 +67,7 @@ public class ItemActivity extends Activity {
 		suitcaseId = extras.getInt("suitcase_id"); // receiving suitcase_id from previous activity
 
 		/* code below is to set the activity title to the trip_name */
-		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
+		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = \"" + suitcaseId + "\"";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();
 		String suitcaseName = c.getString(c.getColumnIndex("suitcase_name"));
@@ -106,13 +86,16 @@ public class ItemActivity extends Activity {
 	protected void onStart() {//when you come back to this activity class
 		super.onStart(); // Always call the superclass method first
 		/* code below is to set the activity title to the trip_name */
-		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = '" + suitcaseId + "'";
+
+  /*when you come back to the item screen*/
+		//notifyEditFunction();	
+		limit=0;
+		String GET_TRIP_NAME = "select * from Suitcase where suitcase_id = \"" + suitcaseId + "\"";
 		Cursor c = db.rawQuery(GET_TRIP_NAME, null);
 		c.moveToFirst();
 		String suitcaseName = c.getString(c.getColumnIndex("suitcase_name"));
 		setTitle("Displaying items for " + suitcaseName);
-		Log.w("Suitcase NAme is", suitcaseName);
-
+	
 		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
 
 		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
@@ -128,18 +111,45 @@ public class ItemActivity extends Activity {
 
 	}
 
+	
+	public void notifyEditFunction(){
+		/* Code below pops up dialogue explaining the app*/
+		Cursor notify = db.rawQuery("SELECT * from ItemNotificationRead", null);
+
+		if (notify.getCount() <= 0) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+			builder.setMessage(
+					"After adding items to your suitcase, you can edit them by pressing and holding the item")
+					.setTitle("Tips:").setCancelable(false)
+					.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					})
+					.setNegativeButton("Do not show again", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							db.execSQL("INSERT INTO ItemNotificationRead (read) Values ('1');");
+							dialog.cancel();
+						}
+					});
+			AlertDialog alert = builder.create();
+			alert.show();
+		}
+		notify.close();
+	
+	}
 	public void createLayoutsFromDB() {
 		/* Code Below fetches trips from item_table and creates a layout */
-		Cursor c = db.rawQuery("SELECT * from Item where suitcase_id = '" + suitcaseId + "'", null);
+		Cursor c = db.rawQuery("SELECT * from Item where suitcase_id = \"" + suitcaseId + "\"", null);
 		c.moveToFirst();
 		while (c.isAfterLast() == false) {
 
 			int isSlashed = c.getInt(c.getColumnIndex("is_slashed"));
 			TextView hw = new TextView(this);
-			String itemName = c.getString(c.getColumnIndex("item_name"));
+			String text = c.getString(c.getColumnIndex("item_name"));
 			int ITEM_ID = c.getInt(c.getColumnIndex("item_id"));
 			String quant = c.getString(c.getColumnIndex("quantity"));
-			hw.setText(" x " + itemName);
+			hw.setText(" x " + text);
 			hw.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 			TextView qtext = new TextView(this);
 			qtext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
@@ -158,7 +168,7 @@ public class ItemActivity extends Activity {
 				checkmarkImage.setPadding(pad, pad, 0, 0);
 
 				ImageView im = new ImageView(this);
-				im.setImageResource(R.drawable.opensuitcase);
+				im.setImageResource(R.drawable.closedsuitcase);
 				// FROM STACKOVERFLOW!
 				im.setLayoutParams(new LayoutParams(width, height));
 				im.setPadding(pad, pad, 0, 0);
@@ -182,10 +192,41 @@ public class ItemActivity extends Activity {
 						ViewGroup.LayoutParams.MATCH_PARENT, 2));
 				c.moveToNext();
 
-				/* Code Below handles the delete situation */
-				newTab.setOnLongClickListener(createDeleteListener(itemName));
+				/* Code Below handles the delete/edit situation */
+				final String text2 = text;
+				final String quantityText=quant;
+				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
+					public boolean onLongClick(View v) {
+
+						 AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						    builder.setTitle("Select your option");
+						           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+						               public void onClick(DialogInterface dialog, int which) {
+						            switch(which){
+						            case 0://edit item name
+						              editNameFromDB(text2, quantityText);
+						              return;
+						            case 1: //edit quanity
+						            	editQuantityFromDB(text2, quantityText);
+						            	return;
+						            case 2://delete    
+						              deleteFromDB(text2);
+						              return;
+						            case 3: //cancel
+						            	dialog.cancel();
+						            	return;
+						            }
+						        }
+						    });
+
+						AlertDialog alert = builder.create();
+						alert.show();
+						return true;
+					}
+				});
 
 				/* Code below handles the situation where u click a item */
+
 				final int item_id2 = ITEM_ID;
 
 				newTab.setOnClickListener(new Button.OnClickListener() {
@@ -210,20 +251,35 @@ public class ItemActivity extends Activity {
 									& (~Paint.STRIKE_THRU_TEXT_FLAG));
 							ll.removeViewAt(3); // removes the checkmark icon
 
-							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id ='"
-									+ item_id2 + "'";
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id =\""
+									+ item_id2 + "\"";
 							db.execSQL(UPDATE_STATEMENT);
-
+							ImageView openSuitcase = new ImageView(ItemActivity.this);
+							openSuitcase.setImageResource(R.drawable.opensuitcase);
+							// FROM STACKOVERFLOW!
+							openSuitcase.setLayoutParams(new LayoutParams(width, height));
+							openSuitcase.setPadding(pad, pad, 0, 0);
+							ll.removeViewAt(0);
+							ll.addView(openSuitcase, 0);
+							
 						}
 
 						else // adds the slash
-						{
+						{  
 							textBox.setPaintFlags(textBox.getPaintFlags()
 									| Paint.STRIKE_THRU_TEXT_FLAG);
 							ll.addView(im);
-							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id='"
-									+ item_id2 + "'";
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id=\""
+									+ item_id2 + "\"";
 							db.execSQL(UPDATE_STATEMENT);
+							ImageView closedSuitcase = new ImageView(ItemActivity.this);
+							closedSuitcase.setImageResource(R.drawable.closedsuitcase);
+							// FROM STACKOVERFLOW!
+							closedSuitcase.setLayoutParams(new LayoutParams(width, height));
+							closedSuitcase.setPadding(pad, pad, 0, 0);
+							ll.removeViewAt(0);
+							ll.addView(closedSuitcase, 0);
+							
 						}
 					}
 				});
@@ -258,22 +314,32 @@ public class ItemActivity extends Activity {
 						ViewGroup.LayoutParams.MATCH_PARENT, 2));
 				c.moveToNext();
 
-				/* Code Below handles the delete situation */
-				final String text2 = itemName;
+				/* Code Below handles the delete/edit situation */
+				final String text2 = text;
+				final String quantityText=quant;
 				newTab.setOnLongClickListener(new OnLongClickListener() { // code to delete a list
 					public boolean onLongClick(View v) {
 
-						AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
-						builder.setMessage("Are you sure you want delete?").setCancelable(false)
-								.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										deleteFromDB(text2, suitcaseId);
-									}
-								}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialog.cancel();
-									}
-								});
+						 AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+						    builder.setTitle("Select your option");
+						           builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
+						               public void onClick(DialogInterface dialog, int which) {
+						            switch(which){
+						            case 0://edit 
+						              editNameFromDB(text2,quantityText);
+						              return;
+						            case 1:
+						            	editQuantityFromDB(text2,quantityText);
+						            	return;
+						            case 2://delete    
+						              deleteFromDB(text2);
+						              return;
+						            case 3: //cancel
+						            	dialog.cancel();
+						            	return;
+						            }
+						        }
+						    });
 
 						AlertDialog alert = builder.create();
 						alert.show();
@@ -284,7 +350,6 @@ public class ItemActivity extends Activity {
 				/* Code below handles the situation where u click a item */
 
 				final int item_id2 = ITEM_ID;
-
 				newTab.setOnClickListener(new Button.OnClickListener() {
 					public void onClick(View view) {
 
@@ -305,17 +370,36 @@ public class ItemActivity extends Activity {
 							textBox.setPaintFlags(textBox.getPaintFlags()
 									& (~Paint.STRIKE_THRU_TEXT_FLAG));
 							ll.removeViewAt(3); // removes the checkmark icon
-
-							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id ='"
-									+ item_id2 + "'";
+							
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '0' WHERE item_id =\""
+									+ item_id2 + "\"";
 							db.execSQL(UPDATE_STATEMENT);
+							ImageView openSuitcase = new ImageView(ItemActivity.this);
+							openSuitcase.setImageResource(R.drawable.opensuitcase);
+							// FROM STACKOVERFLOW!
+							openSuitcase.setLayoutParams(new LayoutParams(width, height));
+							openSuitcase.setPadding(pad, pad, 0, 0);
+							ll.removeViewAt(0);
+							ll.addView(openSuitcase, 0);
+							
+							
+							
 						} else { // adds the slash
 							textBox.setPaintFlags(textBox.getPaintFlags()
 									| Paint.STRIKE_THRU_TEXT_FLAG);
 							ll.addView(im);
-							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id='"
-									+ item_id2 + "'";
+							String UPDATE_STATEMENT = "UPDATE Item SET is_slashed = '1' WHERE item_id=\""
+									+ item_id2 + "\"";
 							db.execSQL(UPDATE_STATEMENT);
+						
+							ImageView closedSuitcase = new ImageView(ItemActivity.this);
+							closedSuitcase.setImageResource(R.drawable.closedsuitcase);
+							// FROM STACKOVERFLOW!
+							closedSuitcase.setLayoutParams(new LayoutParams(width, height));
+							closedSuitcase.setPadding(pad, pad, 0, 0);
+							ll.removeViewAt(0);
+							ll.addView(closedSuitcase, 0);
+							
 						}
 					}
 				});
@@ -324,23 +408,142 @@ public class ItemActivity extends Activity {
 		c.close();
 	}
 
-	public void deleteFromDB(String i, int suitcase_id) {
-		String deleteFromDB = "delete from Item where item_name = '" + i + "' and suitcase_id = '"
-				+ suitcase_id + "'";
-		db.execSQL(deleteFromDB);
-
-		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
-		LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
-		tripContainer.removeAllViews();
-		tripContainer.addView(addTrip);
-		View ruler = new View(this);
-		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-		tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT, 2));
-		createLayoutsFromDB();
+	public void editNameFromDB(final String name, final String quantityText)
+	{
+		final EditText editText = new EditText(ItemActivity.this);
+		editText.setHint("New Item Name");
+		editText.setText(name);
+		LinearLayout layoutForEditText=new LinearLayout(ItemActivity.this);
+		layoutForEditText.setOrientation(LinearLayout.VERTICAL);
+		layoutForEditText.addView(editText);
+		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+		builder.setMessage("Please enter a new item name").setCancelable(false)
+				.setView(layoutForEditText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String newName = editText.getText().toString();		
+						String currItemName;
+				
+						
+					boolean canInsert=canInsertName(quantityText,newName);
+					
+					if(canInsert==true){
+					String editDB = "UPDATE Item SET item_name=\"" + newName + "\", quantity=\""+ quantityText +"\" WHERE item_name=\"" + 
+					name +"\" and suitcase_id = \""+suitcaseId +"\"";
+					db.execSQL(editDB);
+					limit=0;
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(ItemActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+						}		
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
+	}
+	
+	
+	public void editQuantityFromDB(final String name, final String quantityText)
+	{
+		
+		final EditText editQuantity=new EditText(ItemActivity.this);
+		editQuantity.setText(quantityText);
+		editQuantity.setHint("Enter New Quantity");
+		LinearLayout layoutForEditText=new LinearLayout(ItemActivity.this);
+		layoutForEditText.setOrientation(LinearLayout.VERTICAL);
+		layoutForEditText.addView(editQuantity);
+		
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+		builder.setMessage("Please enter a new quantity for '"+ name+"'").setCancelable(false)
+				.setView(layoutForEditText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String currItemName;
+						String newQuantity= editQuantity.getText().toString();
+						
+					boolean canInsert=canInsertQuantity(newQuantity);
+					
+					if(canInsert==true){
+					String editDB = "UPDATE Item SET quantity=\""+ newQuantity +"\" WHERE item_name=\"" + 
+					name +"\" and suitcase_id = \""+suitcaseId +"\"";
+					db.execSQL(editDB);
+					limit=0;
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(ItemActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+						}		
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
+	}
+	
+	public void deleteFromDB(final String i) {
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+		builder.setMessage("Are you sure you want to delete?").setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					String deleteFromDB = "delete from Item where item_name = \"" + i + "\" and suitcase_id=\""+suitcaseId +"\"";
+					db.execSQL(deleteFromDB);
+					limit=0;
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_item);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(ItemActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 
 	}
-
+	public void showDupeMessage(){
+		AlertDialog dupe = new AlertDialog.Builder(
+				ItemActivity.this).create();
+		dupe.setTitle("Duplicate Found");
+		dupe.setMessage("Item name already exists");
+		dupe.setButton("Ok",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,
+							int which) {
+					}
+				});
+		dupe.show();
+	}
 	public void addItem(View view) {// go to add activity screen
 
 		if (limit == 0)// checking to make sure there is no open layouts
@@ -362,7 +565,7 @@ public class ItemActivity extends Activity {
 			Button cancelButton = new Button(this);
 			cancelButton.setText("Cancel");
 			Button quickAddButton = new Button(this);
-			quickAddButton.setText("Quick Add...");
+			quickAddButton.setText("Suggested Items...");
 			LinearLayout ll = new LinearLayout(this);
 			LinearLayout horizontalButtons = new LinearLayout(this);
 			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
@@ -374,12 +577,11 @@ public class ItemActivity extends Activity {
 			ll.addView(itemNameText);
 			ll.addView(quantity);
 			ll.addView(horizontalButtons);
-			ll.addView(quickAddButton);
+			ll.addView(quickAddButton);	
 			newTab.addView(ll);
-
-			View ruler = new View(this);
-			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-			newTab.addView(ruler,
+			View ruler2=new View(this);
+			ruler2.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			newTab.addView(ruler2,
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
 			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.item_container);
@@ -392,7 +594,6 @@ public class ItemActivity extends Activity {
 					limit = 0;
 					Intent intent = new Intent(ItemActivity.this, AddItemActivity.class);
 					intent.putExtra("suitcase_id", suitcaseId);
-					Log.w("sending over suitcase id: ", " " + suitcaseId);
 					startActivityForResult(intent, 1);
 				}
 			});
@@ -430,7 +631,21 @@ public class ItemActivity extends Activity {
 
 						dupe.show();
 
-					} else if (quantity.equals("")) {
+					} 
+					
+					
+					else if(itemName.contains("\""))
+						{
+							AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+							dupe.setMessage("Invalid character detected for item name. Please enter alphabets or numbers for item name");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+
+							dupe.show();
+						}
+					else if (quantity.equals("")) {
 						AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
 						dupe.setMessage("You cannot enter a blank quantity. Please enter a quantity");
 						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
@@ -453,8 +668,8 @@ public class ItemActivity extends Activity {
 					}
 					// code below checks for duplicates in database
 					else {
-						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id='"
-								+ suitcaseId + "'", null);
+						Cursor c = db.rawQuery("SELECT * from Item where suitcase_id=\""
+								+ suitcaseId + "\"", null);
 						c.moveToFirst();
 
 						boolean isDupe = false;
@@ -469,8 +684,8 @@ public class ItemActivity extends Activity {
 						c.close();
 
 						if (isDupe == false) {// it will successfully insert item into db table
-							String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values ('"
-									+ itemName + "', '" + quantity + "','" + suitcaseId + "','0')";
+							String INSERT_STATEMENT = "INSERT INTO Item (item_name, quantity, suitcase_id, is_slashed) Values (\""
+									+ itemName + "\", \"" + quantity + "\",\"" + suitcaseId + "\",\"0\")";
 							db.execSQL(INSERT_STATEMENT); // insert into
 															// item_table db
 							limit = 0; // allow to recreate a new trip
@@ -546,4 +761,88 @@ public class ItemActivity extends Activity {
 		}
 		return result;
 	}
+	
+	public boolean canInsertName(String quantity, String itemName){
+		
+		if (itemName.equals("")) // if they try to add a null
+										// trip to database
+		{
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("You cannot enter a blank item name. Please enter a item name");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		} 
+		
+		 if(itemName.contains("\""))
+			{
+				AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+				dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for item name");
+				dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				});
+
+				dupe.show();
+				return false;
+			}
+		
+		else {
+			String currItemName;
+			Cursor c = db.rawQuery("SELECT * from Item where suitcase_id=\""+suitcaseId+"\"", null);
+			c.moveToFirst();
+			while (c.isAfterLast() == false) {// code will check for duplicates
+				currItemName = c.getString(c.getColumnIndex("item_name"));
+				c.moveToNext();
+				if (itemName.equals(currItemName)) {
+					showDupeMessage();				
+				return false;
+				}
+			}
+			c.close();
+		}
+		
+		return true;
+		
+	}
+	
+	
+public boolean canInsertQuantity(String quantity){
+		
+				
+		if (quantity.equals("")) {
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("You cannot enter a blank quantity. Please enter a quantity");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+       } 
+		
+		else if (!quantity.matches("\\d+")) {
+			AlertDialog dupe = new AlertDialog.Builder(ItemActivity.this).create();
+			dupe.setMessage("Please enter a numeric value for 'Quantity'");
+			dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				}
+			});
+
+			dupe.show();
+			return false;
+
+		}
+		
+		return true;
+		
+	}
+	
+	
 }

@@ -9,5 +9,6 @@
     <string name="title_activity_suitcase">SuitcaseActivity</string>
     <string name="title_activity_item">ItemActivity</string>
     <string name="title_activity_add_item">AddItemActivity</string>
+    <string name="title_activity_suggested_item">SuggestedItemActivity</string>
 
 </resources>
