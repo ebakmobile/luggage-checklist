@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnLongClickListener;
@@ -38,7 +37,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
@@ -47,7 +45,10 @@ import com.lugcheck.db.DAO;
 import com.lugcheck.db.DAOImpl;
 import com.lugcheck.db.DBException;
 import com.lugcheck.guice.GuiceManager;
-
+import com.lugcheck.util.UtilConstants;
+import com.parse.Parse;
+import com.parse.ParseAnalytics;
+import com.parse.ParseObject;
 
 public class MainActivity extends Activity {
 
@@ -57,17 +58,26 @@ public class MainActivity extends Activity {
 	private DAO dao;
 	private float density;
 	int intTripId;
-	final private CharSequence longClickOptions[]={"Edit Trip","Delete Trip", "Cancel"};
+	final private CharSequence longClickOptions[] = { "Edit Trip", "Delete Trip", "Cancel" };
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+
+		/* Test Code: Parse initialization */
+		Parse.initialize(this, UtilConstants.PARSE_APP_ID, UtilConstants.PARSE_CLIENT_KEY);
+		ParseAnalytics.trackAppOpened(getIntent()); // Tracks statistics regarding "app opens". Optional.
+		// Test the sending of some useless data to the server. We can verify this in the Android SDK getting started page on parse.com. This can be removed eventually.
+		ParseObject testObject = new ParseObject("TestObject");
+		testObject.put("foo", "bar");
+		testObject.saveInBackground();
+
 		GuiceManager.getInitialInstance(this);
 		setContentView(R.layout.activity_main);
 		limit = 0;
-		String myAdmobPublisherID="a1508d762ede868";
-		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID); 
+		String myAdmobPublisherID = "a1508d762ede868";
+		adView = new AdView(this, AdSize.SMART_BANNER, myAdmobPublisherID);
 
 		try {
 			initDb();
@@ -129,7 +139,6 @@ public class MainActivity extends Activity {
 
 	public void createLayoutsFromDB() {
 
-
 		/* Code Below fetches trips from trip_table and creates a layout*/
 		Cursor c = db.rawQuery("SELECT * from Trip", null);
 		c.moveToFirst();
@@ -177,9 +186,9 @@ public class MainActivity extends Activity {
 					builder.setTitle("Select your option");
 					builder.setItems(longClickOptions, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int which) {
-							switch(which){
+							switch (which) {
 							case 0://edit 
-								editFromDB(text2,trip_id2); 
+								editFromDB(text2, trip_id2);
 								return;
 							case 1://delete    
 								deleteFromDB(text2);
@@ -190,7 +199,6 @@ public class MainActivity extends Activity {
 							}
 						}
 					});
-
 
 					AlertDialog alert = builder.create();
 					alert.show();
@@ -211,92 +219,92 @@ public class MainActivity extends Activity {
 		c.close();
 	}
 
-	public void editFromDB(final String name,final int trip_id)
-	{	
+	public void editFromDB(final String name, final int trip_id)
+	{
 		final EditText editText = new EditText(MainActivity.this);
 		editText.setHint("New Trip Name");
 		editText.setText(name);
 		AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-		builder.setMessage("Please enter a new name for '" + name+"'").setCancelable(false)
-		.setView(editText)
-		.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				String newName = editText.getText().toString();	
-									
-				String currTripName;
-				boolean canInsert= canInsert(newName,name, trip_id);				
-				if(canInsert==true){
-					String editDB = "UPDATE Trip SET trip_name=\"" + newName + "\" WHERE trip_id=\"" + trip_id + "\" and " +
-							"trip_name=\""+ name +"\"";
-					db.execSQL(editDB);
-					limit=0;
-					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
-					tripContainer.removeAllViews();
-					tripContainer.addView(addTrip);
-					View ruler = new View(MainActivity.this);
-					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-							ViewGroup.LayoutParams.MATCH_PARENT, 2));
-					createLayoutsFromDB();
-				}		
-			}
-		}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.cancel();
-			}
-		});
+		builder.setMessage("Please enter a new name for '" + name + "'").setCancelable(false)
+				.setView(editText)
+				.setPositiveButton("Complete", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String newName = editText.getText().toString();
+
+						String currTripName;
+						boolean canInsert = canInsert(newName, name, trip_id);
+						if (canInsert == true) {
+							String editDB = "UPDATE Trip SET trip_name=\"" + newName + "\" WHERE trip_id=\"" + trip_id + "\" and " +
+									"trip_name=\"" + name + "\"";
+							db.execSQL(editDB);
+							limit = 0;
+							LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+							LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+							tripContainer.removeAllViews();
+							tripContainer.addView(addTrip);
+							View ruler = new View(MainActivity.this);
+							ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+									ViewGroup.LayoutParams.MATCH_PARENT, 2));
+							createLayoutsFromDB();
+						}
+					}
+				}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
 		AlertDialog alert = builder.create();
 		alert.show();
 
 	}
+
 	public void deleteFromDB(final String i) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 		builder.setMessage("Are you sure you want to delete?").setCancelable(false)
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				String deleteFromDB = "delete from Trip where trip_name = \"" + i + "\"";
-				db.execSQL(deleteFromDB);
-				limit=0;
-				LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-				LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
-				tripContainer.removeAllViews();
-				tripContainer.addView(addTrip);
-				View ruler = new View(MainActivity.this);
-				ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-				tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT, 2));
-				createLayoutsFromDB();
-			}
-		}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.cancel();
-			}
-		});
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						String deleteFromDB = "delete from Trip where trip_name = \"" + i + "\"";
+						db.execSQL(deleteFromDB);
+						limit = 0;
+						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+						tripContainer.removeAllViews();
+						tripContainer.addView(addTrip);
+						View ruler = new View(MainActivity.this);
+						ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+						tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+								ViewGroup.LayoutParams.MATCH_PARENT, 2));
+						createLayoutsFromDB();
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
 		AlertDialog alert = builder.create();
 		alert.show();
 
 	}
 
-
-	public void showDupeItem(){
+	public void showDupeItem() {
 		AlertDialog dupe = new AlertDialog.Builder(
 				MainActivity.this).create();
 		dupe.setTitle("Duplicate Found");
 		dupe.setMessage("Trip name already exists");
 		dupe.setButton("Ok",
 				new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,
-					int which) {
-			}
-		});
+					public void onClick(DialogInterface dialog,
+							int which) {
+					}
+				});
 		dupe.show();
 	}
 
-	public boolean canInsert(String itemName, String oldName, int trip_id){
+	public boolean canInsert(String itemName, String oldName, int trip_id) {
 
 		if (itemName.equals("")) // if they try to add a null
-			// trip to database
+		// trip to database
 		{
 			AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
 			dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
@@ -308,8 +316,8 @@ public class MainActivity extends Activity {
 			dupe.show();
 			return false;
 
-		} 
-		else if(itemName.contains("\""))
+		}
+		else if (itemName.contains("\""))
 		{
 			AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
 			dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for trip name");
@@ -320,7 +328,7 @@ public class MainActivity extends Activity {
 
 			dupe.show();
 			return false;
-			
+
 		}
 
 		else {
@@ -331,7 +339,7 @@ public class MainActivity extends Activity {
 				currItemName = c.getString(c.getColumnIndex("trip_name"));
 				c.moveToNext();
 				if (itemName.equals(currItemName)) {
-					showDupeItem();				
+					showDupeItem();
 					return false;
 				}
 			}
@@ -340,69 +348,70 @@ public class MainActivity extends Activity {
 
 		return true;
 
-	}		
+	}
 
 	public void addTrip(View view) {
 		if (limit == 0)//checking to make sure there is no open layouts 
-		{	AdView bottomAd=(AdView)findViewById(R.id.adView);
-		bottomAd.setVisibility(View.INVISIBLE);
-		limit = 1;
-		LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-		final LinearLayout newTab = new LinearLayout(this);
-		newTab.setOrientation(LinearLayout.VERTICAL);
-		final EditText textBox = new EditText(this);
-		textBox.setHint("Enter trip name");
-		textBox.setHeight((int) (60 * density));
-		final Button okButton = new Button(this);
-		okButton.setText("Add");
-		final Button cancelButton = new Button(this);
-		cancelButton.setText("Cancel");
+		{
+			AdView bottomAd = (AdView) findViewById(R.id.adView);
+			bottomAd.setVisibility(View.INVISIBLE);
+			limit = 1;
+			LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+			final LinearLayout newTab = new LinearLayout(this);
+			newTab.setOrientation(LinearLayout.VERTICAL);
+			final EditText textBox = new EditText(this);
+			textBox.setHint("Enter trip name");
+			textBox.setHeight((int) (60 * density));
+			final Button okButton = new Button(this);
+			okButton.setText("Add");
+			final Button cancelButton = new Button(this);
+			cancelButton.setText("Cancel");
 
-		LinearLayout ll = new LinearLayout(this);
-		ll.setOrientation(LinearLayout.VERTICAL);
-		ll.addView(textBox);
+			LinearLayout ll = new LinearLayout(this);
+			ll.setOrientation(LinearLayout.VERTICAL);
+			ll.addView(textBox);
 
-		LinearLayout horizontalButtons = new LinearLayout(this);
-		horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
-		LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT, 1.0f); //param sets it so the width is 50% horizontally. Looked nicer!
-		horizontalButtons.addView(okButton, param);
-		horizontalButtons.addView(cancelButton, param);
-		ll.addView(horizontalButtons);
+			LinearLayout horizontalButtons = new LinearLayout(this);
+			horizontalButtons.setOrientation(LinearLayout.HORIZONTAL);// used to make button horizontal
+			LayoutParams param = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.MATCH_PARENT, 1.0f); //param sets it so the width is 50% horizontally. Looked nicer!
+			horizontalButtons.addView(okButton, param);
+			horizontalButtons.addView(cancelButton, param);
+			ll.addView(horizontalButtons);
 
-		newTab.addView(ll);
-		View ruler = new View(this);
-		ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-		newTab.addView(ruler,
-				new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
+			newTab.addView(ll);
+			View ruler = new View(this);
+			ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+			newTab.addView(ruler,
+					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2));
 
-		LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-		adView.loadAd(new AdRequest());
-		tripContainer.addView(adView,0); //adds the advertisement in the top		
-		tripContainer.addView(newTab, 1, lp);
+			LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+			adView.loadAd(new AdRequest());
+			tripContainer.addView(adView, 0); //adds the advertisement in the top		
+			tripContainer.addView(newTab, 1, lp);
 
-		//Code below is for adding a trip to the database
-		okButton.setOnClickListener(new View.OnClickListener() {
-			@SuppressWarnings("deprecation")
-			public void onClick(View v) {
+			//Code below is for adding a trip to the database
+			okButton.setOnClickListener(new View.OnClickListener() {
+				@SuppressWarnings("deprecation")
+				public void onClick(View v) {
 
-				LinearLayout buttonParent = (LinearLayout) okButton.getParent().getParent();
-				EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
-				String tripName = textBox.getText().toString();
+					LinearLayout buttonParent = (LinearLayout) okButton.getParent().getParent();
+					EditText textBox = (EditText) buttonParent.getChildAt(0);//gets value of textbox 
+					String tripName = textBox.getText().toString();
 
-				if (tripName.equals("")) //if they try to add a null trip to database
-				{
-					AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
-					dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
-					dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-						}
-					});
+					if (tripName.equals("")) //if they try to add a null trip to database
+					{
+						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+						dupe.setMessage("You cannot enter a blank trip name. Please enter a trip name");
+						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+							}
+						});
 
-					dupe.show();
+						dupe.show();
 
-				}
-				else if(tripName.contains("\""))
+					}
+					else if (tripName.contains("\""))
 					{
 						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
 						dupe.setMessage("Invalid character detected. Please enter alphabets or numbers for trip name");
@@ -413,72 +422,72 @@ public class MainActivity extends Activity {
 
 						dupe.show();
 					}
-				//code below checks for duplicates in database
-				else {
-					Cursor c = db.rawQuery("SELECT * from Trip", null);
-					c.moveToFirst();
+					//code below checks for duplicates in database
+					else {
+						Cursor c = db.rawQuery("SELECT * from Trip", null);
+						c.moveToFirst();
 
-					boolean isDupe = false;
-					while (c.isAfterLast() == false) {
-						String text = c.getString(c.getColumnIndex("trip_name"));
-						c.moveToNext();
-						if (text.equals(tripName)) {
-							isDupe = true;
-							break;
-						}
-					}//end while*/
-
-					c.close();
-
-					if (isDupe == false) {
-						String INSERT_STATEMENT = "INSERT INTO Trip (trip_name) Values (\""
-								+ tripName + "\")";
-						db.execSQL(INSERT_STATEMENT); // insert into trip_table db
-
-						limit = 0;
-						LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-						LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
-						tripContainer.removeAllViews();
-						tripContainer.addView(addTrip);
-						View ruler = new View(MainActivity.this);
-						ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-						tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-								ViewGroup.LayoutParams.MATCH_PARENT, 2));
-						createLayoutsFromDB();
-						AdView bottomAd=(AdView)findViewById(R.id.adView);
-						bottomAd.setVisibility(View.VISIBLE);
-					} else {
-
-						AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
-						dupe.setTitle("Duplicate Found");
-						dupe.setMessage("Trip name already exists. Please use that trip instead");
-						dupe.setButton("Ok", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
+						boolean isDupe = false;
+						while (c.isAfterLast() == false) {
+							String text = c.getString(c.getColumnIndex("trip_name"));
+							c.moveToNext();
+							if (text.equals(tripName)) {
+								isDupe = true;
+								break;
 							}
-						});
+						}//end while*/
 
-						dupe.show();
-					}//end else
+						c.close();
+
+						if (isDupe == false) {
+							String INSERT_STATEMENT = "INSERT INTO Trip (trip_name) Values (\""
+									+ tripName + "\")";
+							db.execSQL(INSERT_STATEMENT); // insert into trip_table db
+
+							limit = 0;
+							LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+							LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+							tripContainer.removeAllViews();
+							tripContainer.addView(addTrip);
+							View ruler = new View(MainActivity.this);
+							ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+							tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+									ViewGroup.LayoutParams.MATCH_PARENT, 2));
+							createLayoutsFromDB();
+							AdView bottomAd = (AdView) findViewById(R.id.adView);
+							bottomAd.setVisibility(View.VISIBLE);
+						} else {
+
+							AlertDialog dupe = new AlertDialog.Builder(MainActivity.this).create();
+							dupe.setTitle("Duplicate Found");
+							dupe.setMessage("Trip name already exists. Please use that trip instead");
+							dupe.setButton("Ok", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int which) {
+								}
+							});
+
+							dupe.show();
+						}//end else
+					}
 				}
-			}
-		});
+			});
 
-		cancelButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				limit = 0;
-				LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
-				LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
-				tripContainer.removeAllViews();
-				tripContainer.addView(addTrip);
-				View ruler = new View(MainActivity.this);
-				ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
-				tripContainer.addView(ruler, new ViewGroup.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT, 2));
-				createLayoutsFromDB();
-				AdView bottomAd=(AdView)findViewById(R.id.adView);
-				bottomAd.setVisibility(View.VISIBLE);
-			}
-		});
+			cancelButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					limit = 0;
+					LinearLayout tripContainer = (LinearLayout) findViewById(R.id.trips_container);
+					LinearLayout addTrip = (LinearLayout) findViewById(R.id.add_trip);
+					tripContainer.removeAllViews();
+					tripContainer.addView(addTrip);
+					View ruler = new View(MainActivity.this);
+					ruler.setBackgroundColor(Color.BLACK); // this code draws the black lines
+					tripContainer.addView(ruler, new ViewGroup.LayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT, 2));
+					createLayoutsFromDB();
+					AdView bottomAd = (AdView) findViewById(R.id.adView);
+					bottomAd.setVisibility(View.VISIBLE);
+				}
+			});
 		}
 	}
 
