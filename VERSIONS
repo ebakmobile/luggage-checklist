@@ -16,3 +16,12 @@ This list maps Version Codes to Version Names
 7: 3.4: Added ability to quick add multiple items, and fixed insert into database bug with ' and "
 8: 3.5: Fixed database issues
 9: 3.6: Just "fake" update
+
+*** END OF OLD APP/START OF NEW APP***
+
+10: 4.0: Application rewrite. New features to be included:
+- Server integration (Parse)
+- Login with Facebook, Google and EBAK (Parse) accounts
+- Copy and Paste
+- UI design enhancements
+- Support API 17
