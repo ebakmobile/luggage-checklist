@@ -1,20 +1,16 @@
 package com.lugcheck.db;
 
-import roboguice.inject.ContextSingleton;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import com.google.inject.Inject;
 import com.lugcheck.models.Item;
 import com.lugcheck.models.LugCheckObject;
 import com.lugcheck.models.Suitcase;
 import com.lugcheck.models.Trip;
 
-@ContextSingleton
 public class DAOImpl implements DAO {
 
 	private final DBHelper dbHelper;
 
-	@Inject
 	public DAOImpl(DBHelper dbHelper) {
 		this.dbHelper = dbHelper;
 	}

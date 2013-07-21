@@ -17,4 +17,5 @@ local.properties
 .project
 .classpath
 .settings
+.factorypath
 

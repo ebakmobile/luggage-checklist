@@ -17,7 +17,7 @@
  */
 package com.lugcheck;
 
-import roboguice.activity.RoboActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -26,7 +26,7 @@ import com.lugcheck.util.LugCheckConstants;
 import com.parse.Parse;
 import com.parse.ParseAnalytics;
 
-public class MainActivity extends RoboActivity {
+public class MainActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

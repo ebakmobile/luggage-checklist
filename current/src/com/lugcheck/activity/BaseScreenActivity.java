@@ -17,13 +17,11 @@
  */
 package com.lugcheck.activity;
 
-import roboguice.activity.RoboActivity;
-import com.google.inject.Inject;
+import android.app.Activity;
 import com.lugcheck.db.DAO;
 
-public abstract class BaseScreenActivity extends RoboActivity {
+public abstract class BaseScreenActivity extends Activity {
 
-	@Inject
 	protected DAO dao;
 
 }

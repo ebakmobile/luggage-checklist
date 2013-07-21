@@ -20,8 +20,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="com.lugcheck.LugCheckApplication" >
+        android:theme="@style/AppTheme" >
+        <!-- allowBackup=true is a potential security risk, must revisit -->
         <activity
             android:name="com.lugcheck.MainActivity"
             android:label="@string/app_name"

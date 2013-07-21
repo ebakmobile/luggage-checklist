@@ -19,24 +19,19 @@ package com.lugcheck.db;
 
 import java.util.Arrays;
 import java.util.List;
-import roboguice.inject.ContextSingleton;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
-@ContextSingleton
 public class DBHelper extends SQLiteOpenHelper {
 
 	private final int DB_CURRENT_VERSION;
 
 	private final Context context;
 
-	@Inject
-	public DBHelper(Context context, @Named("db.name") String dbName, @Named("db.version") int dbVersion) {
+	public DBHelper(Context context, /*@Named("db.name")*/String dbName, /*@Named("db.version")*/int dbVersion) {
 		super(context, dbName, null, dbVersion);
 		this.context = context;
 		DB_CURRENT_VERSION = dbVersion;
