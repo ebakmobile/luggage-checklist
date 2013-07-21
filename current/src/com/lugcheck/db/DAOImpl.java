@@ -1,73 +1,33 @@
-/*	
-	NOTICE for Luggage & Suitcase Checklist, an Android app:
-    Copyright (C) 2012 EBAK Mobile
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    */
 package com.lugcheck.db;
 
-import android.content.Context;
+import roboguice.inject.ContextSingleton;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import com.lugcheck.models.Item;
 import com.lugcheck.models.LugCheckObject;
 import com.lugcheck.models.Suitcase;
 import com.lugcheck.models.Trip;
 
-@Singleton
+@ContextSingleton
 public class DAOImpl implements DAO {
 
-	private final String DB_NAME;
-	private final int DB_VERSION;
-
-	private DBHelper dbHelper;
+	private final DBHelper dbHelper;
 
 	@Inject
-	public DAOImpl(@Named("db.name") String dbName, @Named("db.version") String dbVersion) {
-		DB_NAME = dbName;
-		int tempVersion;
-		try {
-			tempVersion = Integer.parseInt(dbVersion);
-		} catch (NumberFormatException e) {
-			tempVersion = -1; // This default value will signify an error;
-			Log.e("DB Error", "An illegal version number was used in the db properties file. "
-					+ "A non-numeric value was probably used.");
-		}
-		DB_VERSION = tempVersion;
+	public DAOImpl(DBHelper dbHelper) {
+		this.dbHelper = dbHelper;
 	}
 
-	public void setup(Context context) throws DBException {
-		dbHelper = DBHelper.getInstance(context, DB_NAME, DB_VERSION);
-	}
-
-	public void insertObject(LugCheckObject obj) {
-		switch (obj.getType()) {
-		case ITEM:
+	public <T extends LugCheckObject> void insertObject(T obj) {
+		if (obj.getClass() == Item.class) {
 			insertItem((Item) obj);
-			break;
-		case SUITCASE:
+		} else if (obj.getClass() == Suitcase.class) {
 			insertSuitcase((Suitcase) obj);
-			break;
-		case TRIP:
+		} else if (obj.getClass() == Trip.class) {
 			insertTrip((Trip) obj);
-			break;
-		default:
-			// ERROR
+		} else {
+			throw new IllegalArgumentException("Illegal or unsupported object passed into insertObject().");
 		}
 	}
 

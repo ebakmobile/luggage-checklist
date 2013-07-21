@@ -15,45 +15,40 @@
 	    You should have received a copy of the GNU General Public License
 	    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lugcheck;
+package com.lugcheck.activity;
 
-import roboguice.activity.RoboActivity;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
-import com.lugcheck.activity.TripScreenActivity;
-import com.lugcheck.util.LugCheckConstants;
-import com.parse.Parse;
-import com.parse.ParseAnalytics;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import com.lugcheck.R;
 
-public class MainActivity extends RoboActivity {
+public class TripScreenActivity extends BaseScreenActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_trip_screen);
 
-		initApp();
+		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
 
-		// Redirect right away
-		Intent intent = new Intent(this, TripScreenActivity.class);
-		startActivity(intent);
+		LinearLayout linearLayout = new LinearLayout(getApplicationContext());
+		linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+		TextView textView = new TextView(getApplicationContext());
+		textView.setText("TripScreenActivity");
+		textView.setTextColor(Color.BLACK);
+		textView.setLayoutParams(lp);
+		linearLayout.addView(textView);
+		addContentView(linearLayout, lp);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.trip_screen, menu);
 		return true;
-	}
-
-	/**
-	 * Setup script that should only be run once when the app boots up or restarts.
-	 */
-	private void initApp() {
-		/* Parse setup */
-		Parse.initialize(this, LugCheckConstants.PARSE_APP_ID, LugCheckConstants.PARSE_CLIENT_KEY);
-		ParseAnalytics.trackAppOpened(getIntent()); // Tracks statistics regarding "app opens". Optional.
 	}
 
 }

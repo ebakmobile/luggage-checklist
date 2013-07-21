@@ -4,5 +4,7 @@
     <string name="app_name">Luggage &amp; Suitcase Checklist</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_screen_base">ScreenBaseActivity</string>
+    <string name="title_activity_trip_screen">TripScreenActivity</string>
 
 </resources>
