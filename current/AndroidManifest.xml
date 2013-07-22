@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme" >
         <!-- allowBackup=true is a potential security risk, must revisit -->
         <activity
-            android:name="com.lugcheck.MainActivity"
+            android:name="com.lugcheck.MainActivity_"
             android:label="@string/app_name"
             android:noHistory="true" >
             <intent-filter>
@@ -32,11 +32,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.lugcheck.activity.BaseScreenActivity"
+            android:name="com.lugcheck.activity.BaseScreenActivity_"
             android:label="@string/title_activity_screen_base" >
         </activity>
         <activity
-            android:name="com.lugcheck.activity.TripScreenActivity"
+            android:name="com.lugcheck.activity.TripScreenActivity_"
             android:label="@string/title_activity_trip_screen" >
         </activity>
         

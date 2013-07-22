@@ -18,8 +18,11 @@
 package com.lugcheck.activity;
 
 import android.app.Activity;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.lugcheck.R;
 import com.lugcheck.db.DAO;
 
+@EActivity(R.layout.activity_screen_base)
 public abstract class BaseScreenActivity extends Activity {
 
 	protected DAO dao;

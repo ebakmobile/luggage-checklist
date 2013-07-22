@@ -19,18 +19,20 @@ package com.lugcheck.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.lugcheck.R;
 
+@EActivity(R.layout.activity_trip_screen)
+@OptionsMenu(R.menu.trip_screen)
 public class TripScreenActivity extends BaseScreenActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_trip_screen);
 
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
 
@@ -42,13 +44,6 @@ public class TripScreenActivity extends BaseScreenActivity {
 		textView.setLayoutParams(lp);
 		linearLayout.addView(textView);
 		addContentView(linearLayout, lp);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.trip_screen, menu);
-		return true;
 	}
 
 }
