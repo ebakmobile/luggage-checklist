@@ -24,21 +24,26 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.OptionsMenu;
+import com.googlecode.androidannotations.annotations.UiThread;
 import com.lugcheck.R;
 
 @EActivity(R.layout.activity_trip_screen)
 @OptionsMenu(R.menu.trip_screen)
 public class TripScreenActivity extends BaseScreenActivity {
 
+	private LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		initView();
+	}
 
-		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-
-		LinearLayout linearLayout = new LinearLayout(getApplicationContext());
+	@UiThread
+	public void initView() {
+		LinearLayout linearLayout = new LinearLayout(getBaseContext());
 		linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-		TextView textView = new TextView(getApplicationContext());
+		TextView textView = new TextView(getBaseContext());
 		textView.setText("TripScreenActivity");
 		textView.setTextColor(Color.BLACK);
 		textView.setLayoutParams(lp);

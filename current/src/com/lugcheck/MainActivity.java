@@ -42,7 +42,14 @@ public class MainActivity extends Activity {
 	 * Setup script that should only be run once when the app boots up or restarts.
 	 */
 	private void initApp() {
-		/* Parse setup */
+		// Stupid thing that we need to do in order to prevent a NoClassDefFoundError for Parse: https://code.google.com/p/android/issues/detail?id=20915
+		try {
+			Class.forName("android.os.AsyncTask");
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Unable to initialize the application due to an internal error.", e);
+		}
+
+		// Parse setup
 		Parse.initialize(this, LugCheckConstants.PARSE_APP_ID, LugCheckConstants.PARSE_CLIENT_KEY);
 		ParseAnalytics.trackAppOpened(getIntent()); // Tracks statistics regarding "app opens". Optional.
 	}
