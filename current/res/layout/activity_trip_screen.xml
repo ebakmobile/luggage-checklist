@@ -7,5 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".TripScreenActivity" >
+    
+    <include layout="@layout/activity_screen_base"/>
 
 </RelativeLayout>

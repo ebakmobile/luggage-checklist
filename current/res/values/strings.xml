@@ -1,10 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Luggage &amp; Suitcase Checklist</string>
+    <string name="menu_settings">Settings</string>
     <string name="action_settings">Settings</string>
+    <string name="add_new_trip">Add New Trip</string>
     <string name="hello_world">Hello world!</string>
+    
+    <!-- Activity titles -->
+    <string name="title_activity_main">Luggage Checklist</string>
+    <string name="title_activity_suitcase">SuitcaseActivity</string>
+    <string name="title_activity_item">ItemActivity</string>
+    <string name="title_activity_add_item">AddItemActivity</string>
+    <string name="title_activity_suggested_item">SuggestedItemActivity</string>
     <string name="title_activity_screen_base">ScreenBaseActivity</string>
     <string name="title_activity_trip_screen">TripScreenActivity</string>
-
+    
+    <!-- Content descriptions for images -->
+    <string name="desc_plus_sign">Plus sign</string>
 </resources>
